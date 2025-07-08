@@ -1,7 +1,7 @@
 #include "globalVariables.h"
 #include <Arduino.h>
 
-extern SystemStatus status;
+extern SystemStatus status = WAITING;
 extern SystemStatus previous_status = WAITING; //used for serial monitor update
 
 extern unsigned long source_time = 0;  //in milliseconds, used to check if the system is working "as expected" for the inferior tank

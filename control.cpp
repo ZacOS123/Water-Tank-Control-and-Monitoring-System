@@ -62,24 +62,24 @@ void start_pump(){      //Turns on the pump to fill upper tank
 void stop_pump(){   //turns of the pump
   digitalWrite(PUMP_PIN, LOW);
   switch (status){  //changes status relative to the past status
-  case PUMPING:
-    status = WAITING;
-    break;
-  case PUMPING_FILLING:
-    status = FILLING; //PROGRAM_ERROR if start_pumping while it's already pumping
-    break;
+    case PUMPING:
+      status = WAITING;
+      break;
+    case PUMPING_FILLING:
+      status = FILLING; //PROGRAM_ERROR if start_pumping while it's already pumping
+      break;
 
-  case PROGRAM_ERROR:  
-  case SENSOR_ERROR:  
-  case PUMP_ERROR: 
-    break; 
- 
-  case WAITING:
-  case FILLING:
-  case SOURCE_ERROR:
-  default:
-    status = PROGRAM_ERROR;
-    break;
+    case PROGRAM_ERROR:  
+    case SENSOR_ERROR:  
+    case PUMP_ERROR: 
+      break; 
+  
+    case WAITING:
+    case FILLING:
+    case SOURCE_ERROR:
+    default:
+      status = PROGRAM_ERROR;
+      break;
   }
 } 
 
