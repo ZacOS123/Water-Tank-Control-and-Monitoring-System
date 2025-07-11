@@ -30,7 +30,6 @@ int get_level (int sensor_pin){    //returns water level in selected tank. Retur
 
 void start_pump(){      //Turns on the pump to fill upper tank
   digitalWrite(PUMP_PIN, HIGH);
-  Serial.println("Pump started...");
   sup_level_at_start = get_level(SUP_SENSOR_PIN);
   pump_time = millis(); //starts timer (used for check functions)
   switch (status){  //changes status relative to the past status
@@ -62,7 +61,6 @@ void start_pump(){      //Turns on the pump to fill upper tank
 
 void stop_pump(){   //turns of the pump
   digitalWrite(PUMP_PIN, LOW);
-  Serial.println("Pump stopped...");
   switch (status){  //changes status relative to the past status
     case PUMPING:
       status = WAITING;
@@ -110,7 +108,6 @@ int check_pumping(){      //Checks if upper tank is being filled. Returns 0 for 
 
 void start_source(){      //Turns on water to fill lower tank
   digitalWrite(SOURCE_PIN, HIGH);
-  Serial.println("Source started...");
   inf_level_at_start = get_level(INF_SENSOR_PIN);
   source_time = millis(); //starts timer (used for check functions)
   switch (status){   //changes status relative to the past status
@@ -138,7 +135,6 @@ void start_source(){      //Turns on water to fill lower tank
 
 void stop_source(){     //Stops filling the inf tank
   digitalWrite(SOURCE_PIN, LOW);
-  Serial.println("Source stopped...");
   switch (status){    //changes status relative to the past status
   case FILLING:
     status = WAITING;

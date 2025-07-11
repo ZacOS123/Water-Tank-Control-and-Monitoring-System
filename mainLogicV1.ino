@@ -1,3 +1,4 @@
+// v.1.1 //
 
 #include "control.h"
 #include "config/config.h"
@@ -58,10 +59,37 @@ void loop()
 
   
   ////v.1.1//////////
+  //////// LOWER TANK BLOCK /////////////////
+  if(INF_TANK_HI - inf_current_level > INF_TANK_HI / SENSOR_RANGE){ //if lower tank not full
+    start_source();
+  }
+  else{ //if lower tank full
+    stop_source();
+  }
+
+  //////// UPPER TANK BLOCK /////////////
+  if(sup_current_level < SUP_ACC_LEVEL && inf_current_level >= MIN_INF_TO_PUMP){  //if upper tank under acceptable level AND lower not empty
+    start_pump();
+  }
+  if(SUP_TANK_HI - sup_current_level < SUP_TANK_HI / SENSOR_RANGE || inf_current_level < INF_TANK_HI / SENSOR_RANGE){  //if upper tank full OR lower tank empty
+    stop_pump();
+  }
   
+  /////// Pump and Source Check ///////
+  if(status == PUMPING || status == PUMPING_FILLING){
+    check_pumping();
+  }
   
-  
-  
+  if(status == FILLING || status == PUMPING_FILLING){
+    check_source();
+  }
+
+  /////// ERRORS ///////////
+
+
+
+
+
   ////v.1.0//////////
   /* switch (status){
     /////////////////////////////////////////////////////////////////////////////////////////////////////

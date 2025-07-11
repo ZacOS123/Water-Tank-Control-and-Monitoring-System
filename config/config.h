@@ -10,7 +10,7 @@
 
 /////MAX/MIN TANK LEVELS/////
 #define INF_TANK_LO 0    //Sensor value when inferior tank is Empty (Low)
-#define INF_TANK_HI 935  //Sensor value when inferior tank is Full (High)
+#define INF_TANK_HI 1024  //Sensor value when inferior tank is Full (High)
 #define SUP_TANK_LO 0         //Sensor value when superior tank is Empty (Low)
 #define SUP_TANK_HI 1024      //Sensor value when superior tank is Full (High)
 
