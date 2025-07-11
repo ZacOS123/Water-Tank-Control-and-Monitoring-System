@@ -1,15 +1,15 @@
 #include "control.h"
 #include "globalVariables.h"
-#include "config.h"
+#include "config/config.h"
 #include <Arduino.h>
 
 
 int get_level (int sensor_pin){    //returns water level in selected tank. Return -1 for sensor/program error after setting status
-  if (sensor_pin < 0 || sensor_pin > 16){  //checks if sensor pin is acceptable (set for Arduino UNO)
-    status = PROGRAM_ERROR;
-    return -1;
-  }
-  else{
+ // if (sensor_pin < 0 || sensor_pin > 19){  //checks if sensor pin is acceptable (set for Arduino UNO)
+ //   status = PROGRAM_ERROR;
+ //   return -1;
+ // }
+ // else{
     int value = analogRead(sensor_pin);  //possible feature: takes different values and calculates the average, for accurate readings...
     if (sensor_pin == INF_SENSOR_PIN && (value < INF_TANK_LO || value > INF_TANK_HI)){ //checks if sensor values are acceptable corresponding to the inf tank
       status = SENSOR_ERROR;
@@ -23,13 +23,14 @@ int get_level (int sensor_pin){    //returns water level in selected tank. Retur
       return value;
     }
 
-  }
+ // }
 }
 
 ////////////////  PUMP  //////////////////////////////////////////////////////////////////////////
 
 void start_pump(){      //Turns on the pump to fill upper tank
   digitalWrite(PUMP_PIN, HIGH);
+  Serial.println("Pump started...");
   sup_level_at_start = get_level(SUP_SENSOR_PIN);
   pump_time = millis(); //starts timer (used for check functions)
   switch (status){  //changes status relative to the past status
@@ -61,22 +62,24 @@ void start_pump(){      //Turns on the pump to fill upper tank
 
 void stop_pump(){   //turns of the pump
   digitalWrite(PUMP_PIN, LOW);
+  Serial.println("Pump stopped...");
   switch (status){  //changes status relative to the past status
     case PUMPING:
       status = WAITING;
       break;
     case PUMPING_FILLING:
-      status = FILLING; //PROGRAM_ERROR if start_pumping while it's already pumping
+      status = FILLING; 
       break;
 
     case PROGRAM_ERROR:  
     case SENSOR_ERROR:  
-    case PUMP_ERROR: 
+    case PUMP_ERROR:     
+    case SOURCE_ERROR:
       break; 
   
     case WAITING:
     case FILLING:
-    case SOURCE_ERROR:
+
     default:
       status = PROGRAM_ERROR;
       break;
@@ -107,6 +110,7 @@ int check_pumping(){      //Checks if upper tank is being filled. Returns 0 for 
 
 void start_source(){      //Turns on water to fill lower tank
   digitalWrite(SOURCE_PIN, HIGH);
+  Serial.println("Source started...");
   inf_level_at_start = get_level(INF_SENSOR_PIN);
   source_time = millis(); //starts timer (used for check functions)
   switch (status){   //changes status relative to the past status
@@ -119,12 +123,13 @@ void start_source(){      //Turns on water to fill lower tank
 
   case PROGRAM_ERROR:  
   case SENSOR_ERROR:  
-  case PUMP_ERROR: 
+  case PUMP_ERROR:
+  case SOURCE_ERROR:
     break;
 
   case FILLING:
   case PUMPING_FILLING:
-  case SOURCE_ERROR:
+
   default:
     status = PROGRAM_ERROR;
     break;
@@ -133,6 +138,7 @@ void start_source(){      //Turns on water to fill lower tank
 
 void stop_source(){     //Stops filling the inf tank
   digitalWrite(SOURCE_PIN, LOW);
+  Serial.println("Source stopped...");
   switch (status){    //changes status relative to the past status
   case FILLING:
     status = WAITING;
@@ -162,7 +168,7 @@ int check_source(){      //Checks if lower tank is being filled. Returns 0 for "
   else
   {
     int level = get_level(INF_SENSOR_PIN);
-    if (level == -1){return -1;}  //In case get_level had errors
+    if (level == -1){return 0;}  //In case get_level had errors
     if(level - inf_level_at_start <= 0){  //checks if the current level is lower or higher than the level at start
       status = SOURCE_ERROR;
       source_time = millis();

@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config/config.h"
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H //Prevents double definitions

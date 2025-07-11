@@ -1,6 +1,6 @@
 
 #include "control.h"
-#include "config.h"
+#include "config/config.h"
 #include "globalVariables.h"
 
 void setup()
@@ -60,8 +60,7 @@ void loop()
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     case WAITING:
-      if(sup_current_level < SUP_ACC_LEVEL)  //if current level less that acceptable level
-      {
+      if(sup_current_level < SUP_ACC_LEVEL){  //if current level less than acceptable level
         if(inf_current_level >= MIN_INF_TO_PUMP){
           start_pump();
           break;
@@ -72,7 +71,7 @@ void loop()
         }
       }
       else{
-        if(INF_TANK_HI - inf_current_level <= INF_TANK_HI / SENSOR_RANGE){  
+        if(INF_TANK_HI - inf_current_level >= INF_TANK_HI / SENSOR_RANGE){  
           start_source();
           break;
         }
@@ -143,11 +142,11 @@ void loop()
       }
       else{   //else, if check_source gives error
         break;
-      }    
+      } 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     case PUMPING_FILLING:
-      if(check_pumping == 1 || check_pumping == 0){  //checks if pump is pumping
+      if(check_pumping != -1){  //checks if pump is pumping
         if(SUP_TANK_HI - sup_current_level < SUP_TANK_HI / SENSOR_RANGE){
           stop_pump();
           if(INF_TANK_HI - inf_current_level < INF_TANK_HI/SENSOR_RANGE){
@@ -181,27 +180,26 @@ void loop()
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
     case SENSOR_ERROR:
-      while(status = SENSOR_ERROR){  //Continously checks sensors, changes status when sensors values are right
-        //Check upper tank sensor
-        if(get_level(SUP_SENSOR_PIN) == -1){
-          status = SENSOR_ERROR;
-          Serial.println("ERROR: upper tank sensor malfunctioning.");
-        }
-        else{
-          Serial.println("Upper tank sensor working properly.");
-          status = WAITING;
-        }
+      delay(5000);
+      //Continously checks sensors, changes status when sensors values are right
+      //Check upper tank sensor
+      if(get_level(SUP_SENSOR_PIN) == -1){
+        status = SENSOR_ERROR;
+        Serial.println("ERROR: upper tank sensor malfunctioning.");
+      }
+      else{
+        Serial.println("Upper tank sensor working properly.");
+        status = WAITING;
+      }
 
-        //Check upper tank sensor
-        if(get_level(INF_SENSOR_PIN) == -1){
-          status = SENSOR_ERROR;
-          Serial.println("ERROR: lower tank sensor malfunctioning.");
-        }
-        else{
-          Serial.println("Lower tank sensor working properly.\n");
-          status = WAITING;
-        }
-        delay(5000);
+      //Check lower tank sensor
+      if(get_level(INF_SENSOR_PIN) == -1){
+        status = SENSOR_ERROR;
+        Serial.println("ERROR: lower tank sensor malfunctioning.");
+      }
+      else{
+        Serial.println("Lower tank sensor working properly.\n");
+        status = WAITING;
       }
       break;
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,23 +222,27 @@ void loop()
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
     case SOURCE_ERROR:
-      while(check_source() != 1){
-        if(sup_current_level < SUP_ACC_LEVEL && inf_current_level > MIN_INF_TO_PUMP){  //pumps remaining water if needed. Pumps in case lower tank comes alternatively filled
-          Serial.println("Pumping remaining water. System will be interrupted afterwards if source not available.");
-          do{
-            start_pump();
-            if(check_pumping() == -1)
-            {
-              break;
-            }
-          } while(SUP_TANK_HI - sup_current_level >= SUP_TANK_HI - SENSOR_RANGE && status == SOURCE_ERROR);
-          stop_pump();
-          Serial.println("Finished pumping remaining water.");
-          status = SOURCE_ERROR;
-        }
-        Serial.println("Source error. Lower tank is not being filled. System interrupted until water source is available.");
-        delay(5000);
+      if(sup_current_level < SUP_ACC_LEVEL && inf_current_level > MIN_INF_TO_PUMP){  //pumps remaining water if needed. Pumps in case lower tank comes alternatively filled
+        Serial.println("Pumping remaining water. System will be interrupted afterwards if source not available.");
+        start_pump();
+        while(sup_current_level < SUP_ACC_LEVEL && inf_current_level > MIN_INF_TO_PUMP){
+          if(check_pumping() == -1)
+          {
+            break;
+          }
+        } 
+        stop_pump();
+        Serial.println("Finished pumping remaining water.");
+        status = SOURCE_ERROR;
       }
+      if(check_source() == 1){
+        status = FILLING;
+        break;
+      }
+      Serial.println("Source error. Lower tank is not being filled. System interrupted until water source is available.\n");
+      delay(5000);
+      break;
+        
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     default:
