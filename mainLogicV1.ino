@@ -56,7 +56,14 @@ void loop()
   inf_current_level = get_level(INF_SENSOR_PIN);
   sup_current_level = get_level(SUP_SENSOR_PIN);
 
-  switch (status){
+  
+  ////v.1.1//////////
+  
+  
+  
+  
+  ////v.1.0//////////
+  /* switch (status){
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     case WAITING:
@@ -249,5 +256,5 @@ void loop()
       status = PROGRAM_ERROR;
       break;
     //////////////////////////////////////////////////////////////////////////////////////////////////
-  }
+  } */
 }
