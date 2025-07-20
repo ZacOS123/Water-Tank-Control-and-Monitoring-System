@@ -17,7 +17,7 @@
 /////MINIMUM VALUES/////
 #define MIN_INF_TO_PUMP  INF_TANK_HI/6  //Minimum inferior tank level to pump
 #define SUP_ACC_LEVEL    SUP_TANK_HI/6   //Superior tank threshold for pumping (lower than threshold --> pump)
-#define TIME_TO_CHECK   30000            //Time in ms to check if pumping or source are working (30000ms = 5mins)
+#define TIME_TO_CHECK   10000            //Time in ms to check if pumping or source are working
 #define SENSOR_RANGE    10    //divider of the highest value, used to give flexibility because sensor values are precise (divides tank highest level by its value)
 
 

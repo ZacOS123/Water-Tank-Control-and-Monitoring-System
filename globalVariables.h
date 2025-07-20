@@ -8,7 +8,6 @@ typedef enum {
   PUMPING, //Pump ON and pumping
   FILLING, //Filling inferior tank with source
 	PUMPING_FILLING, //Pump ON and filling inferior tank
-	PROGRAM_ERROR,  //values error
 	SENSOR_ERROR,  //unexpected values from sensors
 	PUMP_ERROR,  //Tank not filling while pump is ON
   SOURCE_ERROR, //No water input to the lower tank
