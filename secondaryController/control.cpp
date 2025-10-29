@@ -2,6 +2,8 @@
 #include "globalVariables.h"
 #include "config/config.h"
 #include <Arduino.h>
+#include <ArduinoBLE.h>
+
 
 
 ///// NOTE: level means the air not water level, due to ultrasonic inverted measurment. ////
@@ -41,7 +43,7 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
 }
 
 ///////////////////////////////////////////////////////////////////
-/*
+
 int update_data_BLE (){
   if(BLE.connected()){
     if (millis() > BLE_time + TIME_TO_UPDATE){
@@ -60,7 +62,7 @@ int update_data_BLE (){
     return -1;
   }
 }
-*/
+
 ///////////////////////////////////////////////////////////////////
 
 void start_source(){      //Turns on the pump to fill upper tank
@@ -107,3 +109,17 @@ int check_source(){      //Checks if lower tank is being filled. Returns 0 for "
    return 0; //does nothing if it has not elapsed TIME_TO_CHECK
   }
 }
+
+///////////////////////////////////////////////////
+
+void disconnect_handler(BLEDevice central){
+  BLE_ERROR = true;
+}
+
+///////////////////////////////////////////////////
+
+void connect_handler(BLEDevice central){
+  BLE_ERROR = false;
+}
+
+

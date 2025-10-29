@@ -27,7 +27,7 @@
 #define SUP_ACC_LEVEL    (SUP_SENSOR_HI - SUP_SENSOR_LO)/4   //Superior tank threshold for pumping (lower than threshold --> pump)
 #define TIME_TO_CHECK   10000            //Time in ms to check if pumping or source are working
 #define SENSOR_RANGE    10    //divider of the highest value, used to give flexibility because sensor values are precise (divides tank highest level by its value)
-#define TIME_TO_UPDATE  30000  // time to send water level to main controller (BLE)
+#define TIME_TO_UPDATE  30000  // time to update BLE data
 
 #endif
 

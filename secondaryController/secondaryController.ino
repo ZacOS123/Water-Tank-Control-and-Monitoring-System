@@ -32,21 +32,27 @@ void setup()
   }
 
   //Bluetooth setup
-  /*
-  BLE.begin();
-  BLE.setLocalName(infTank);
-  BLE.addService(systemService);
-  waterLevel = BLEShortCharacteristic(74ac19c2-5aa1-4419-9426-dab1961d0b9f1, PROPERTY_INDICATE);
-*/
+  if(!BLE.begin()){
+    BLE_ERROR = true;
+  }
+  else{
+    BLE.setLocalName("infTank");
+    systemService.addCharacteristic(waterLevel);
+    systemService.addCharacteristic(infStatus);
+    BLE.addService(systemService);
+    BLE.setEventHandler(BLEDisconnected, disconnect_handler);
+    BLE.setEventHandler(BLEDisconnected, connect_handler);
+    BLE.advertise();
+  }
 
 }
 
 void loop(){
   inf_current_level = get_level_inf(); //inverted due to ultrasonic sensor
-  //pCharacteristic->setValue(inf_current_level);
 
   handle_error();
   handle_lower_tank();
-  //handle_communication();
+  handle_communication();
+
   log();
 }
