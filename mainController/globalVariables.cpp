@@ -11,3 +11,7 @@ int inf_current_level;  //saves the lower tank's water level for the current loo
 int sup_current_level;  //saves the upper tank's water level for the current loop
 int lower_status;  //saves lower controller and tank status
 
+bool SENSOR_ERROR = false;
+bool PUMP_ERROR = false;
+bool BLE_ERROR = false;
+bool WIFI_ERROR = false;

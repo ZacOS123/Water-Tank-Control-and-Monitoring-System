@@ -5,12 +5,12 @@
 
 
 void handle_lower_tank (){
-  if(status != SENSOR_ERROR && status != SENSOR_SOURCE_ERROR){
+  if(status != BLOCKING_ERROR){
     if(inf_current_level > INF_SENSOR_LO + ((INF_SENSOR_HI - INF_SENSOR_LO) / SENSOR_RANGE)){  //if lower tank not full
       start_source();
       status = FILLING;
       if(check_source() == -1){
-        status = SOURCE_ERROR;
+        SOURCE_ERROR = true;
       }
     }
     else{  //Lower tank full
@@ -24,29 +24,24 @@ void handle_lower_tank (){
 //////////////////////////////////////////////////////////////////////
 
 void handle_error(){
-  if(inf_current_level == -1){ //checks sensors
-    switch (status){
-      case SOURCE_ERROR:  status = SENSOR_SOURCE_ERROR; break;
-      case SENSOR_SOURCE_ERROR: break;
-      default: status = SENSOR_ERROR; break;
-    }
+  //Check sensor//
+  if(inf_current_level == -1){
+    SENSOR_ERROR = true;
+    status = BLOCKING_ERROR;
   }
   else{
-    switch (status){
-      case SENSOR_SOURCE_ERROR: status = SOURCE_ERROR; break;
-      case SENSOR_ERROR: status = WAITING; break;
-    }
+    SENSOR_ERROR = false;
   }
 }
 
 //////////////////////////////////////////////////////////////////////
-
+/*
 void handle_communication(){
   if(update_data_BLE() == -1){
     status = BLE_ERROR;
   }
 }
-
+*/
 //////////////////////////////////////////////////////////////////////
 
 void log(){
@@ -55,9 +50,17 @@ void log(){
     switch (status){
       case WAITING: Serial.println("Status: Waiting..."); break;
       case FILLING: Serial.println("Status: Filling lower tank..."); break;
-      case SENSOR_ERROR: Serial.println("ERROR: Upper tank sensor values are not acceptable. Try re-calibrating sensors."); break;
-      case SOURCE_ERROR:  Serial.println("SOURCE_ERROR"); break;
-      case SENSOR_SOURCE_ERROR:  Serial.println("SOURCE and SENSOR ERROR"); break;
+      case BLOCKING_ERROR: Serial.print("The following error occurred:"); 
+        if(SENSOR_ERROR){
+          Serial.println("Sensor error.\nSystem interrupted.\nCheck sensor or consider re-calibrating.");
+        }
+        else if(SOURCE_ERROR){
+          Serial.println("Source error.\nSystem operation will continue if water is present.");
+        }
+        else if(BLE_ERROR){
+          Serial.println("Bluetooth connection lost.\nTrying to reconnect...");
+        }
+        break;
     }
   }
 }

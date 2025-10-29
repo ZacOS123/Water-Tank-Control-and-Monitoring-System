@@ -41,7 +41,7 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
 }
 
 ///////////////////////////////////////////////////////////////////
-
+/*
 int update_data_BLE (){
   if(BLE.connected()){
     if (millis() > BLE_time + TIME_TO_UPDATE){
@@ -60,7 +60,7 @@ int update_data_BLE (){
     return -1;
   }
 }
-
+*/
 ///////////////////////////////////////////////////////////////////
 
 void start_source(){      //Turns on the pump to fill upper tank

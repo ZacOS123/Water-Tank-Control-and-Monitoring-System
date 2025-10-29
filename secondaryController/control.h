@@ -1,7 +1,7 @@
 //This code defines the functions of the sensors
 
 int get_level_inf (); //returns inferior tank water level
-int update_data_BLE (); //sends a data update to main controller
+//int update_data_BLE (); //sends a data update to main controller
 
 void start_source();  //Turns on the pump to fill upper tank
 void stop_source(); //turns of the pump

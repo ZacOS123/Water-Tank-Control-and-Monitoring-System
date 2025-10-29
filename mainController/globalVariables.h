@@ -6,9 +6,7 @@
 typedef enum {
 	WAITING, //All tanks are full and the system is waiting OR system is starting up
   PUMPING, //Pump ON and pumping
-	SENSOR_ERROR,  //unexpected values from upper tank sensors
-	PUMP_ERROR,  //Tank not filling while pump is ON
-  SENSOR_PUMP_ERROR, //both Pump and sensor not working
+  BLOCKING_ERROR, // blocking error occured, system interrupted.
 } SystemStatus;
 
 extern SystemStatus status;
@@ -19,6 +17,10 @@ extern int inf_current_level;  //saves the lower tank's air level for the curren
 extern int sup_current_level;  //saves the upper tank's air level for the current loop
 extern int lower_status; //saves lower controller and tank status
 
+extern bool SENSOR_ERROR;
+extern bool PUMP_ERROR;
+extern bool BLE_ERROR;
+extern bool WIFI_ERROR;
 
 #endif
 

@@ -8,10 +8,7 @@
 typedef enum {
 	WAITING, //All tanks are full and the system is waiting OR system is starting up
   FILLING, //Filling inferior tank with source
-  SENSOR_ERROR, //unexpected values from lower tank sensor
-  SOURCE_ERROR, //No water input to the lower tank
-  SENSOR_SOURCE_ERROR, //Both source and sensor not working
-  BLE_ERROR, //BLE not connected
+  BLOCKING_ERROR, //A blocking error occured. Check error flags
 } SystemStatus;
 
 extern SystemStatus status;
@@ -25,13 +22,10 @@ extern BLEService systemService;
 extern BLEUnsignedShortCharacteristic waterLevel;
 extern BLEUnsignedShortCharacteristic infStatus;
 
-/*
-uint8_t errorFlags; //integer to save error flags (bitwise)
-#define SENSOR_ERROR      0x01  // bit 0
-#define SOURCE_ERROR  0x02  // bit 1
-#define BLE_ERROR    0x03  // bit 2
-//use bitwise operators to change errorFlags: if 101 --> sensor and BLE error...
-*/
+extern bool SENSOR_ERROR;
+extern bool SOURCE_ERROR;
+extern bool BLE_ERROR;
+
 
 #endif
 
