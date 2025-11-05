@@ -5,14 +5,7 @@
 #include "globalVariables.h"
 #include "logic.h"
 #include "connectivity.h"
-
-// Replace with your Arduino peripheral's UUIDs
-/*
-BLEUUID serviceUUID("12345678-1234-1234-1234-1234567890ab");
-BLEUUID charUUID("abcdefab-1234-1234-1234-abcdefabcdef");
-
-BLECentral bleCentral(serviceUUID, charUUID);
-*/
+#include <NimBLEDevice.h>
 
 void setup()
 {
@@ -40,13 +33,17 @@ void setup()
   /////////Cloud connection setup////////
 
   ////////Bluetooth connection setup////////
-  //bleCentral.begin();
+  NimBLEDevice::init("supTank");
+  BLE_scan();
+  if (BLE_connect() == 0){
+    BLE_ERROR = false;
+  }
 }
 
 
 void loop(){
   sup_current_level = get_level_sup(); // same here
-  lower_status = get_lower_status(); //saves lower system status
+  get_inf_data(); //updates data from lower tank
 
   handle_error();
   handle_upper_tank();

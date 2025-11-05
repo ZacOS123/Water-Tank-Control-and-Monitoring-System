@@ -1,4 +1,5 @@
 #include "config/config.h"
+#include <Arduino.h>
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H //Prevents double definitions
@@ -15,7 +16,7 @@ extern unsigned long pump_time;  //in milliseconds, used to check if the system 
 extern int sup_level_at_start; //air level in sup tank when the pump started
 extern int inf_current_level;  //saves the lower tank's air level for the current loop
 extern int sup_current_level;  //saves the upper tank's air level for the current loop
-extern int lower_status; //saves lower controller and tank status
+extern uint8_t inf_errors; //saves error flags: bit 0 = SENSOR_ERROR, bit 1 = SOURCE_ERROR,
 
 extern bool SENSOR_ERROR;
 extern bool PUMP_ERROR;

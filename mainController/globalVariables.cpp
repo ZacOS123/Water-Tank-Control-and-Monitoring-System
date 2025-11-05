@@ -9,9 +9,9 @@ int sup_level_at_start; //water level in sup tank when the pump started
 
 int inf_current_level;  //saves the lower tank's water level for the current loop
 int sup_current_level;  //saves the upper tank's water level for the current loop
-int lower_status;  //saves lower controller and tank status
+uint8_t inf_errors = 0x03;  //saves lower controller and tank status
 
-bool SENSOR_ERROR = false;
+bool SENSOR_ERROR = true;
 bool PUMP_ERROR = false;
-bool BLE_ERROR = false;
-bool WIFI_ERROR = false;
+bool BLE_ERROR = true;
+bool WIFI_ERROR = true;

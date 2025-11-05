@@ -41,16 +41,6 @@ int get_level_sup(){    //returns water level in superior tank. Return -1 for se
 
 ///////////////////////////////////////////////////////////////////
 
-int get_level_inf(){    //returns water level in superior tank. Return -1 for sensor after setting status
- /////BLUETOOTH/////
-}
-
-int get_lower_status(){
-  ///////BLUETOOTH/////////
-}
-
-///////////////////////////////////////////////////////////////////
-
 void start_pump(){      //Turns on the pump to fill upper tank
   digitalWrite(PUMP_PIN, HIGH);
 }

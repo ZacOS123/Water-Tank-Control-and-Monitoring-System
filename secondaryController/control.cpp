@@ -46,16 +46,24 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
 
 int update_data_BLE (){
   if(BLE.connected()){
+
+    //update water level
     if (millis() > BLE_time + TIME_TO_UPDATE){
       waterLevel.writeValue( ( (INF_SENSOR_HI - inf_current_level) * 100 )/(INF_SENSOR_HI - INF_SENSOR_LO)); //sends water level as percentage
       Serial.println("Water level updated." );
       BLE_time = millis();
     }
 
-    if (previous_status != status){
-      infStatus.writeValue(status);
-      Serial.println("Status updated");
+    //update error flags. Sends as a byte with flags
+    unit8_t error_byte = 0;
+    if (SENSOR_ERROR){
+      error_byte |= 0x01;  //first byte set to 1
     }
+    if (SOURCE_ERROR){
+      error_byte |= 0x02;  //second byte set to 1
+    }
+    infErrors.writeValue(error_byte);
+
     return 0;
   }
   else{

@@ -1,11 +1,13 @@
 #include "control.h"
 #include "globalVariables.h"
 #include "config/config.h"
+#include "connectivity.h"
 #include <Arduino.h>
+#include <NimBLEDevice.h>
 
 
 void handle_upper_tank (){
-  if(status != BLOCKING_ERROR && lower_status != 3){ //get_lower_status code corrisponding to enum (3 = blocking error)
+  if(status != BLOCKING_ERROR && !(inf_errors & 0x01)){ // if status normal and no lower tank sensor error
     if(sup_current_level > SUP_ACC_LEVEL && inf_current_level >= MIN_INF_TO_PUMP){  //if upper tank under acceptable level AND lower not empty
       start_pump();
       status = PUMPING;
@@ -25,7 +27,7 @@ void handle_upper_tank (){
 ////////////////////////////////
 
 void handle_error(){
-  //checks sensors
+  //checks sensors continiously
   if(sup_current_level == -1){
     stop_pump();
     SENSOR_ERROR = true;
@@ -34,11 +36,30 @@ void handle_error(){
     SENSOR_ERROR = false;
   }
 
+  //Check BLE if BLE_ERROR is true
+  if (BLE_ERROR){
+    status = BLOCKING_ERROR;
+    if (pClient->isConnected()) {
+      get_inf_data();
+    }
+    else {
+      BLE_scan();
+      if (BLE_connect() == 0){
+        BLE_ERROR = false;
+      }
+    }
+  }
+
+
   //Set status
   if(SENSOR_ERROR || PUMP_ERROR || BLE_ERROR){
     stop_pump();
     status = BLOCKING_ERROR;
   }
+  else{
+    status = WAITING;
+  }
+
 }
 
 /////////////////////////////////
