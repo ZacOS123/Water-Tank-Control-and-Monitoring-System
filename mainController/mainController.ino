@@ -6,9 +6,9 @@
 #include "logic.h"
 #include "connectivity.h"
 #include <NimBLEDevice.h>
+#include <WiFi.h>
 
-void setup()
-{
+void setup(){
   Serial.begin(9600);
   Serial.println(" ");
   Serial.println("Hello!");
@@ -30,14 +30,31 @@ void setup()
     SENSOR_ERROR = false;
   }
 
-  /////////Cloud connection setup////////
+  /////////WiFi connection setup////////
+  Serial.println("Connecting to WiFi...");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
 
+  for(int k=0; k<10; k++) {
+    if(WiFi.status() != WL_CONNECTED){
+      WIFI_ERROR = false;
+      Serial.println("WiFi connected!");
+      break;
+    }
+    delay(1000);
+    Serial.print(".");
+    if(k == 9){
+      WIFI_ERROR = true;
+      Serial.println("Unable to connect! (System will keep retrying...)");
+    }
+  }
+  
   ////////Bluetooth connection setup////////
   NimBLEDevice::init("supTank");
-  BLE_scan();
-  if (BLE_connect() == 0){
+  if (BLE_scan_and_connect() == 0){
     BLE_ERROR = false;
   }
+
 }
 
 

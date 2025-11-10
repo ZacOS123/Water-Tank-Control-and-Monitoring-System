@@ -1,6 +1,6 @@
 //BLE and Wifi functions
 
-void BLE_scan(); //start BLE and scan for devices
-int BLE_connect(); //connects to inf tank controller
+//// BLE //////
 
+int BLE_scan_and_connect(); //Scans and connects to inf tank. returns -1 for error, 0 for success
 int get_inf_data(); //updates local lower tank data

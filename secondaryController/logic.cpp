@@ -37,11 +37,14 @@ void handle_error(){
 //////////////////////////////////////////////////////////////////////
 
 void handle_communication(){
+  BLE.poll();
   if(millis() - BLE_time >= TIME_TO_UPDATE){ // updates data every [TIME_TO_UPDATE]
-    if (!BLE_ERROR && !SENSOR_ERROR){
-      BLE_time = millis();
-      waterLevel.writeValue( ((INF_SENSOR_HI - inf_current_level)*100) / (INF_SENSOR_HI - INF_SENSOR_LO) ); //save water level as percentage
-      infStatus.writeValue(status);
+    if(update_data_BLE() == -1){
+      BLE_ERROR = true;
+    }
+    else{
+      BLE_ERROR = false;
+      Serial.println("BLE data updated!");
     }
   } 
 }

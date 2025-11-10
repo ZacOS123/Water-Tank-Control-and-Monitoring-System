@@ -34,15 +34,22 @@ void setup()
   //Bluetooth setup
   if(!BLE.begin()){
     BLE_ERROR = true;
+    Serial.println("Failed to start BLE!");
   }
   else{
     BLE.setLocalName("infTank");
+    BLE.setDeviceName("infTank");
+    BLE.setAdvertisedService(systemService);
     systemService.addCharacteristic(waterLevel);
-    systemService.addCharacteristic(infStatus);
+    systemService.addCharacteristic(infErrors);
     BLE.addService(systemService);
+    
     BLE.setEventHandler(BLEDisconnected, disconnect_handler);
-    BLE.setEventHandler(BLEDisconnected, connect_handler);
+    BLE.setEventHandler(BLEConnected, connect_handler);
+
     BLE.advertise();
+    Serial.println("Started advertising...");
+    BLE_ERROR = false;
   }
 
 }

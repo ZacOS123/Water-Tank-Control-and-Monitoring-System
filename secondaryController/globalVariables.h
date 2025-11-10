@@ -20,7 +20,7 @@ extern unsigned long BLE_time; //in milliseconds, used to check elapsed time for
 
 extern BLEService systemService;
 extern BLEShortCharacteristic waterLevel;
-extern BLEShortCharacteristic infStatus;
+extern BLEShortCharacteristic infErrors;
 
 extern bool SENSOR_ERROR;
 extern bool SOURCE_ERROR;

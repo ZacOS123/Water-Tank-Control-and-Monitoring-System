@@ -19,12 +19,18 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
   distance = 0;
 
   //Send trigger [MEASURE_NUM] times
+
   for(int i=0; i<MEASURE_NUM; i++){
     digitalWrite(INF_TRIG_PIN, HIGH);
+    
+    BLE.poll(); //to maintain BLE connection
     delayMicroseconds(10);
+    BLE.poll(); //to maintain BLE connection
+
     digitalWrite(INF_TRIG_PIN, LOW);
 
-    raw_distance[i] = (pulseIn(INF_ECHO_PIN, HIGH) * 0.0343)/2;
+
+    raw_distance[i] = (pulseIn(INF_ECHO_PIN, HIGH, 50000) * 0.0343)/2;
   }
 
   for(int j=0; j<MEASURE_NUM; j++){
@@ -32,7 +38,7 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
   }
 
   distance = distance/MEASURE_NUM;
-
+  BLE.poll(); //to maintain BLE connection since pulseIn is blocking
   //error check
   if(distance > INF_SENSOR_HI || distance < INF_SENSOR_LO){
     return -1;
@@ -44,18 +50,19 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
 
 ///////////////////////////////////////////////////////////////////
 
-int update_data_BLE (){
+int update_data_BLE (){ //updates data for BLE. returns -1 if connection lost
   if(BLE.connected()){
 
     //update water level
     if (millis() > BLE_time + TIME_TO_UPDATE){
-      waterLevel.writeValue( ( (INF_SENSOR_HI - inf_current_level) * 100 )/(INF_SENSOR_HI - INF_SENSOR_LO)); //sends water level as percentage
-      Serial.println("Water level updated." );
+      uint8_t percentage = ( (INF_SENSOR_HI - inf_current_level) * 100 )/(INF_SENSOR_HI - INF_SENSOR_LO); //calculates water percentage relative to inf tank
+      waterLevel.writeValue(percentage); //sends water level as percentage
+      Serial.println("Water level updated.");
       BLE_time = millis();
     }
 
     //update error flags. Sends as a byte with flags
-    unit8_t error_byte = 0;
+    uint8_t error_byte = 0;
     if (SENSOR_ERROR){
       error_byte |= 0x01;  //first byte set to 1
     }
@@ -122,6 +129,7 @@ int check_source(){      //Checks if lower tank is being filled. Returns 0 for "
 
 void disconnect_handler(BLEDevice central){
   BLE_ERROR = true;
+  BLE.advertise();
 }
 
 ///////////////////////////////////////////////////

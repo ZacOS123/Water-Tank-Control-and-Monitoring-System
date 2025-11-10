@@ -17,7 +17,7 @@ bool BLE_ERROR = true;
 
 
 BLEService systemService("74ac19c2-5aa1-4419-9426-dab1961d0b9f");  // Custom service UUID
-BLEShortCharacteristic waterLevel("74ac19c2-5aa1-4419-9426-dab1961d0b9f1", BLERead | BLEIndicate);
-BLEShortCharacteristic infErrors("74ac19c2-5aa1-4419-9426-dab1961d0b9f2", BLERead | BLEIndicate);
+BLEShortCharacteristic waterLevel("74ac19c2-5aa1-4419-9426-dab1961d0b91", BLERead | BLEIndicate);
+BLEShortCharacteristic infErrors("74ac19c2-5aa1-4419-9426-dab1961d0b92", BLERead | BLEIndicate);
 
 

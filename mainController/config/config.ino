@@ -8,9 +8,6 @@ unsigned long start_time;
 void setup(){
   Serial.begin(9600);
 
-  pinMode(INF_TRIG_PIN, OUTPUT);
-  pinMode(INF_ECHO_PIN, INPUT);
-
   pinMode(SUP_TRIG_PIN, OUTPUT);
   pinMode(SUP_ECHO_PIN, INPUT);
 }

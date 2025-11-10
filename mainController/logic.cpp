@@ -4,6 +4,7 @@
 #include "connectivity.h"
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <WiFi.h>
 
 
 void handle_upper_tank (){
@@ -27,7 +28,8 @@ void handle_upper_tank (){
 ////////////////////////////////
 
 void handle_error(){
-  //checks sensors continiously
+
+  //checks sensors continiously//
   if(sup_current_level == -1){
     stop_pump();
     SENSOR_ERROR = true;
@@ -36,22 +38,33 @@ void handle_error(){
     SENSOR_ERROR = false;
   }
 
-  //Check BLE if BLE_ERROR is true
+
+  //Check BLE if BLE_ERROR is true//
   if (BLE_ERROR){
     status = BLOCKING_ERROR;
-    if (pClient->isConnected()) {
-      get_inf_data();
+    if(pClient != nullptr){
+      if (pClient->isConnected()) {
+        get_inf_data();
+      }
     }
     else {
-      BLE_scan();
-      if (BLE_connect() == 0){
+      if (BLE_scan_and_connect() == 0){
         BLE_ERROR = false;
       }
     }
   }
 
+  //Check Wifi//
+  if(WiFi.status() != WL_CONNECTED){
+      WIFI_ERROR = false;
+  }
+  else{
+    WIFI_ERROR = true;
+    Serial.println("WiFi disconnected! (trying to reconnect...)");
+  }
 
-  //Set status
+
+  //Set status//
   if(SENSOR_ERROR || PUMP_ERROR || BLE_ERROR){
     stop_pump();
     status = BLOCKING_ERROR;
