@@ -247,7 +247,8 @@ class _UpperChartState extends State<UpperChartWidget>{
             )
           ],
         ),
-        SizedBox(height: 20,)
+        SizedBox(height: 20,),
+        remainingTime(),
       ],
       )
     );

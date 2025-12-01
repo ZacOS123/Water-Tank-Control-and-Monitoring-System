@@ -173,3 +173,26 @@ String upperGraphTime(int n) {
     return '--';
   }
 }
+
+Widget remainingTime(){
+  if(measurement != null){
+    int time = (measurement!.documents[0].values[1] & 0x0000FF00) >> 8;
+    if(time > 0  && measurement!.documents[0].values[1] * 0x08 == 8){
+      return Container(
+        padding: EdgeInsets.only(top: 6, bottom: 10),
+        child: Center(
+          child:  Text(
+            'About $time minutes until full.',
+            style: TextStyle(
+              fontFamily: 'Onest',
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: const Color.fromARGB(255, 169, 169, 169)
+            ),  
+          ) 
+        ),
+      );
+    }
+  }
+  return SizedBox(width: 0);
+}
