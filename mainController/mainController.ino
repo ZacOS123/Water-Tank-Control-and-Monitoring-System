@@ -33,37 +33,55 @@ void setup(){
   /////////WiFi connection setup////////
   Serial.println("Connecting to WiFi...");
   WiFi.mode(WIFI_STA);
+  WiFi.onEvent(WiFi_error_handler);
   WiFi.begin(ssid, password);
+  
 
+  wl_status_t wifi_status; //saves wifi status for current loop (as enum in wifi.h)
   for(int k=0; k<10; k++) {
-    if(WiFi.status() != WL_CONNECTED){
+    wifi_status = WiFi.status();
+    if(wifi_status == WL_CONNECTED){
       WIFI_ERROR = false;
       Serial.println("WiFi connected!");
+
+      //get current time
+      Serial.println("Getting date and time... ");
+      configTime(0, 0, "pool.ntp.org");
+      while(now < 20){
+        now = time(nullptr);
+      }
+      Serial.println("Done!");
+      sync_time = millis();
       break;
     }
     delay(1000);
     Serial.print(".");
-    if(k == 9){
+    if(k == 9 && wifi_status != WL_CONNECTED){
       WIFI_ERROR = true;
       Serial.println("Unable to connect! (System will keep retrying...)");
     }
   }
-  
+
+ 
   ////////Bluetooth connection setup////////
-  NimBLEDevice::init("supTank");
+/*  NimBLEDevice::init("supTank");
   if (BLE_scan_and_connect() == 0){
     BLE_ERROR = false;
   }
-
+  else{
+    BLE_ERROR = true;
+  }
+*/
 }
 
 
 void loop(){
   sup_current_level = get_level_sup(); // same here
-  get_inf_data(); //updates data from lower tank
+ // get_inf_data(); //updates data from lower tank
 
   handle_error();
   handle_upper_tank();
+  update_cloud();
   
   log();
 }

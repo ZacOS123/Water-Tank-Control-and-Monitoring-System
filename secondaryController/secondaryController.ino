@@ -11,7 +11,7 @@
 void setup()
 {
   Serial.begin(9600);
-  Serial.println(" ");
+  while (!Serial);
   Serial.println("Hello!");
 
   //pin setup

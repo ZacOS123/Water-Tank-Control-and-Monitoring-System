@@ -35,7 +35,7 @@ int get_level_sup(){    //returns water level in superior tank. Return -1 for se
     return -1;
   }
   else{
-    return distance; //inverts the distance for water level (because distance is measured from top to bottom)
+    return distance;
   }
 }
 

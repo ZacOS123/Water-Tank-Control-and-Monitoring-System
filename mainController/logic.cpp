@@ -38,7 +38,7 @@ void handle_error(){
     SENSOR_ERROR = false;
   }
 
-
+/*
   //Check BLE if BLE_ERROR is true//
   if (BLE_ERROR){
     status = BLOCKING_ERROR;
@@ -51,27 +51,12 @@ void handle_error(){
       if (BLE_scan_and_connect() == 0){
         BLE_ERROR = false;
       }
+      else{
+        BLE_ERROR = true;
+      }
     }
   }
-
-  //Check Wifi//
-  if(WiFi.status() != WL_CONNECTED){
-      WIFI_ERROR = false;
-  }
-  else{
-    WIFI_ERROR = true;
-    Serial.println("WiFi disconnected! (trying to reconnect...)");
-  }
-
-
-  //Set status//
-  if(SENSOR_ERROR || PUMP_ERROR || BLE_ERROR){
-    stop_pump();
-    status = BLOCKING_ERROR;
-  }
-  else{
-    status = WAITING;
-  }
+*/
 
 }
 
@@ -96,7 +81,7 @@ void log(){
         break;
     }
     if(WIFI_ERROR){
-      Serial.println("Connection to server lost. The system will continue offline.\nTrying to reconnect...");
+      Serial.println("WiFi error!");
     }
   }
 }

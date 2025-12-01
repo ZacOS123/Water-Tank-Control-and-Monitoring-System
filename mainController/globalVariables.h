@@ -11,6 +11,9 @@ typedef enum {
   BLOCKING_ERROR, // blocking error occured, system interrupted.
 } SystemStatus;
 
+extern time_t now;
+extern unsigned long sync_time;
+extern unsigned long update_time;
 extern SystemStatus status;
 extern SystemStatus previous_status; //used for serial monitor update
 extern unsigned long pump_time;  //in milliseconds, used to check if the system is working "as expected" for the superior tank
@@ -21,13 +24,13 @@ extern uint8_t inf_errors; //saves error flags: bit 0 = SENSOR_ERROR, bit 1 = SO
 
 extern const char* ssid;
 extern const char* password;
-
+/*
 extern NimBLEClient *pClient;
 extern NimBLERemoteService *pService;
 extern NimBLERemoteCharacteristic *pInf_level;
 extern NimBLERemoteCharacteristic *pError_flags;
 extern NimBLEUUID serviceUuid;
-
+*/
 extern bool SENSOR_ERROR;
 extern bool PUMP_ERROR;
 extern bool BLE_ERROR;

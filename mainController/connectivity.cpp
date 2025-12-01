@@ -1,7 +1,12 @@
 #include "connectivity.h"
 #include "globalVariables.h"
+#include "config/config.h"
 #include <NimBLEDevice.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 
+/*
 int BLE_scan_and_connect(){ //Scans and connects to inf tank. returns -1 for error, 0 for success
 
   NimBLEScan *pScan = NimBLEDevice::getScan();
@@ -73,5 +78,83 @@ int get_inf_data (){  //returns inferior tank water level
     }
   }
 } 
-
+*/
 //////////////////////////////////////////////////////////////////////////
+
+//// WiFi and Cloud ////
+
+////////////////////////////////////////////////////////////////////////////
+
+void update_cloud(){ //updates data on cloud (measurify)
+  if(!WIFI_ERROR && millis() - update_time >= TIME_TO_UPDATE){
+    update_time = millis();
+    Serial.println("Updating cloud data...");
+    HTTPClient http;
+    WiFiClientSecure client;
+    client.setInsecure();   // used for https instead of http
+    if(!http.begin("https://tracker.elioslab.net/v1/measurements/Livello_acqua_A/timeserie")){
+      Serial.println("HTTP error: Couldn't prepare connection");
+    }
+    
+    //sup error flags build
+    uint8_t sup_errors = 0x00; //error flags
+    if(SENSOR_ERROR){
+      sup_errors |= 0x01;
+    }
+    if(PUMP_ERROR){
+      sup_errors |= 0x02;
+    }
+    if(BLE_ERROR){
+      sup_errors |= 0x04;
+    }
+    if(status == PUMPING){
+      sup_errors |= 0x08;
+    }
+
+    //convert water level to percentage
+    int percentage = ((SUP_SENSOR_HI - sup_current_level)*100)/(SUP_SENSOR_HI - SUP_SENSOR_LO);
+    
+
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "DVC eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2UiOnsiX2lkIjoiRGlzcG9zaXRpdm8xIiwiZmVhdHVyZXMiOlsiTGl2ZWxsb19BY3F1YSJdLCJ0aGluZ3MiOlsiQ2lzdGVybmFBIiwiQ2lzdGVybmFCIl0sInZpc2liaWxpdHkiOiJwdWJsaWMiLCJvd25lciI6IjY5MWQ5OGZlNGEzYmY4MDAxZWJhMTVhMCJ9LCJ0ZW5hbnQiOnsicGFzc3dvcmRoYXNoIjp0cnVlLCJfaWQiOiJ3YXRlcl9jb250cm9sIiwib3JnYW5pemF0aW9uIjoiTWVhc3VyaWZ5IG9yZyIsImFkZHJlc3MiOiJNZWFzdXJpZnkgU3RyZWV0LCBHZW5vdmEiLCJlbWFpbCI6ImluZm9AbWVhc3VyaWZ5Lm9yZyIsInBob25lIjoiKzM5MTAzMjE4NzkzODE3IiwiZGF0YWJhc2UiOiJ3YXRlcl9jb250cm9sIn0sImlhdCI6MTc2MzczNDQwNCwiZXhwIjozMzMyMTMzNDQwNH0.pW2g-fBg-tYhvdunMrBu4NPDGJYnn3nKWv8Uvq3WxOc");
+
+    // json string build
+    String json = "{";
+    json += "\"timestamp\": \"" + String((now*1000) + (millis() - sync_time)) + "\","; 
+    json += "\"values\": [" + String(percentage) + ", " + String(sup_errors) + "]";
+    json += "}";
+
+//String(now + ((millis() - sync_time) / 1000))
+
+    int httpCode = http.POST(json);
+    if (httpCode > 0) {
+      Serial.println("Response code: " + String(httpCode));
+    }
+    else {
+      Serial.println("POST failed");
+      Serial.print("Response code: ");
+      Serial.println(httpCode);
+    }
+    http.end();
+  }
+}
+
+////////////////////////////////////////////////////////////////////
+
+void WiFi_error_handler(WiFiEvent_t event, WiFiEventInfo_t info){ //checks if wifi is still connected
+  switch (event) {
+    case IP_EVENT_STA_GOT_IP:
+      WIFI_ERROR = false;
+      Serial.println("WiFi connected");
+      break;
+
+    case WIFI_EVENT_STA_DISCONNECTED:
+      WIFI_ERROR = true;
+      Serial.println("WiFi disconnected");
+      break;
+  }
+}
+
+
+
+

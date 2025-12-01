@@ -3,26 +3,31 @@
 //When you're done, re-upload mainLogic.ino to the microcontroller and it should work.
 
 #include "config.h"
-unsigned long start_time;
+#include <Arduino.h>
+
+int ledPin = 27; // any GPIO
+int ledChannel = 0;
+int resolution = 8; // 8-bit resolution: 0-255
 
 void setup(){
   Serial.begin(9600);
 
   pinMode(SUP_TRIG_PIN, OUTPUT);
   pinMode(SUP_ECHO_PIN, INPUT);
+
+  ledcAttach(ledPin, 5000, resolution);
 }
 
 void loop(){
   long raw_distance [MEASURE_NUM];
   float distance;
-
+  ledcWrite(ledPin, 255);
   Serial.print("\n\nLower tank Ultrasonic Trigger is connected to pin ");
-  Serial.println(INF_TRIG_PIN);
+  Serial.println(SUP_TRIG_PIN);
   Serial.print("\nLower tank Ultrasonic ECHO is connected to pin ");
-  Serial.println(INF_ECHO_PIN);
+  Serial.println(SUP_ECHO_PIN);
   delay(3000);
-  Serial.println("INVERTED Sensor values will be shown for 10 seconds. Empty = SUP_TANK_HI:");
-  Serial.print("Starting in:  ");
+  Serial.println("Sensor values will be shown starting in: ");
   delay(1000);
   Serial.print("1");
   delay(1000);
@@ -30,19 +35,19 @@ void loop(){
   delay(1000);
   Serial.print("   3\n\n");
   delay(1000);
-  start_time = millis();
-  while(millis() - start_time < 10000){
+
+  while(1){
     //set pin to LOW
-    digitalWrite(INF_TRIG_PIN, LOW); 
+    digitalWrite(SUP_TRIG_PIN, LOW); 
     delayMicroseconds(2);
     distance = 0;
     //Send trigger [MEASURE_NUM] times
       for(int i=0; i<MEASURE_NUM; i++){
-        digitalWrite(INF_TRIG_PIN, HIGH);
+        digitalWrite(SUP_TRIG_PIN, HIGH);
         delayMicroseconds(10);
-        digitalWrite(INF_TRIG_PIN, LOW);
+        digitalWrite(SUP_TRIG_PIN, LOW);
 
-        raw_distance[i] = (pulseIn(INF_ECHO_PIN, HIGH) * 0.0343)/2;
+        raw_distance[i] = (pulseIn(SUP_ECHO_PIN, HIGH) * 0.0343)/2;
       }
       for(int j=0; j<MEASURE_NUM; j++){
         distance = distance + raw_distance[j];
@@ -51,25 +56,9 @@ void loop(){
 
     Serial.print(distance/MEASURE_NUM);
     Serial.print("\n");
+    ledcWrite(ledPin, distance/MEASURE_NUM);
+
     delay(300);
   }
-/*
-  Serial.print("\n\nUpper tank sensor is connected to pin ");
-  Serial.println(SUP_SENSOR_PIN);
-  delay(2000);
-  Serial.println("Sensor values will be shown for 10 seconds:");
-  Serial.print("Starting in:  ");
-  delay(1000);
-  Serial.print("1");
-  delay(1000);
-  Serial.print("  2");
-  delay(1000);
-  Serial.print("   3\n\n");
-  delay(1000);
-  start_time = millis();
-  while(millis() - start_time < 10000){
-    Serial.print(analogRead(SUP_SENSOR_PIN));
-    Serial.print("   ");
-    delay(300);
-  }*/
+
 }

@@ -6,7 +6,7 @@
 
 
 
-///// NOTE: level means the air not water level, due to ultrasonic inverted measurment. ////
+/////note: level means the air not water level, due to ultrasonic inverted measurment. ////
 
 int get_level_inf(){    //returns air level in inferior tank. Return -1 for sensor error
 
@@ -21,16 +21,17 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
   //Send trigger [MEASURE_NUM] times
 
   for(int i=0; i<MEASURE_NUM; i++){
-    digitalWrite(INF_TRIG_PIN, HIGH);
+    BLE.poll(); //to maintain BLE connection
     
-    BLE.poll(); //to maintain BLE connection
+    digitalWrite(INF_TRIG_PIN, HIGH);
+  
     delayMicroseconds(10);
-    BLE.poll(); //to maintain BLE connection
-
+  
     digitalWrite(INF_TRIG_PIN, LOW);
 
-
     raw_distance[i] = (pulseIn(INF_ECHO_PIN, HIGH, 50000) * 0.0343)/2;
+
+    BLE.poll(); //to maintain BLE connection
   }
 
   for(int j=0; j<MEASURE_NUM; j++){
