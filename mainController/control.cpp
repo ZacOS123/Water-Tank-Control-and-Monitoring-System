@@ -8,7 +8,7 @@
 int get_level_sup(){    //returns water level in superior tank. Return -1 for sensor after setting status
 
   long raw_distance [MEASURE_NUM];
-  int distance;
+  float distance;
 
  //set pin to LOW
   digitalWrite(SUP_TRIG_PIN, LOW); 
@@ -22,6 +22,7 @@ int get_level_sup(){    //returns water level in superior tank. Return -1 for se
     digitalWrite(SUP_TRIG_PIN, LOW);
 
     raw_distance[i] = (pulseIn(SUP_ECHO_PIN, HIGH) * 0.0343)/2;
+    delay(100);
   }
 
   for(int j=0; j<MEASURE_NUM; j++){

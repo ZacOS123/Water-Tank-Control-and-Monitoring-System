@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:water_monitor/widgets/lowerChart_widget.dart';
 import 'package:water_monitor/widgets/upperChart_widget.dart';
-import 'package:water_monitor/data/functions.dart';
 
 
 class HistoryPage extends StatefulWidget{
@@ -19,22 +18,22 @@ class _HistoryPage extends State<HistoryPage>{
   void initState() { 
     super.initState();
   }
-
+/*
   Future<void> firstRefresh() async{
     await getData();
     setState(() {});
   }
-
+*/
   @override
   Widget build(BuildContext context){
-    return RefreshIndicator.adaptive(
+    return /*RefreshIndicator.adaptive(
       color: Theme.of(context).colorScheme.onPrimary,
       backgroundColor: Theme.of(context).colorScheme.primary,
       onRefresh: () async{
         await getData();
         setState(() {});
       },
-      child: ListView(
+      child:*/ ListView(
         physics: AlwaysScrollableScrollPhysics(),
         children:[ Column(children: [
           Text('History', style: TextStyle(
@@ -49,7 +48,7 @@ class _HistoryPage extends State<HistoryPage>{
           SizedBox(height: 30),
         ]
         ),]
-      ),
-    );
+      );
+  //  );
   }
 }

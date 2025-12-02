@@ -1,3 +1,9 @@
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'constants.dart';
+
 
 class Docs {
   final List<MeasurementData> documents;
@@ -78,4 +84,40 @@ class MeasurementData {
   }
 }
 
-Docs? measurement;
+class DocsHolder extends ChangeNotifier {
+  Docs? _current;
+  Timer? _timer;
+
+  Docs? get current => _current;
+
+  DocsHolder() {
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    fetchDocs();
+    _timer = Timer.periodic(Duration(seconds: 2), (_) => fetchDocs());
+  }
+
+  Future<void> fetchDocs() async {
+    final response = await http.get(
+      url, 
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      _current = Docs.fromJson(json.decode(response.body));
+      notifyListeners();
+    }
+    else{
+      print('http error code: ${response.statusCode}');
+    }
+  }
+
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}

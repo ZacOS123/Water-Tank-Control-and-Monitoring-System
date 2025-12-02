@@ -2,19 +2,21 @@
 import 'package:flutter/material.dart';
 import 'package:water_monitor/data/classes.dart';
 import 'package:water_monitor/data/functions.dart';
-
+import 'package:provider/provider.dart';
 
 class UpperTankWidget extends StatelessWidget{
   const UpperTankWidget ({super.key});
 
   @override
   Widget build(BuildContext context){
+    final measurement = context.watch<DocsHolder>().current;
+
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(top: 24, left: 20, right: 20),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
-        border: upperBoarder(),
+        border: upperBoarder(context),
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
@@ -42,8 +44,8 @@ class UpperTankWidget extends StatelessWidget{
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            upperPercentage(),  //gets right percentage
-                            upperStatus(),
+                            upperPercentage(context),  //gets right percentage
+                            upperStatus(context),
                           ],
                         ),
                       ],
@@ -56,19 +58,7 @@ class UpperTankWidget extends StatelessWidget{
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children:[ 
-                      Container(
-                        height: upperHeight(),  //max 140
-                        width: 115, //max 115
-                        margin: EdgeInsets.only(bottom: 24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [const Color.fromARGB(255, 4, 14, 90), const Color.fromARGB(255, 97, 207, 237)],
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
-                          ),
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
-                        ),
-                      ),
+                      upperHeight(context),
                       Image.asset('assets/images/tank.png', scale: 3.8,),//TANK PICTURE
                       Padding(
                         padding: EdgeInsets.only(bottom: 70),
@@ -79,7 +69,7 @@ class UpperTankWidget extends StatelessWidget{
                 ),              
               ]
             ),
-            remainingTime(),
+            remainingTime(context),
           ],
         ), 
     );

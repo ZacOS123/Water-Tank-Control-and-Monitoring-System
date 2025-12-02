@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:water_monitor/data/classes.dart';
 import 'package:water_monitor/data/functions.dart';
+import 'package:provider/provider.dart';
 
 class UpperChartWidget extends StatefulWidget{
   const UpperChartWidget ({super.key});
@@ -13,6 +14,7 @@ class _UpperChartState extends State<UpperChartWidget>{
 
   @override
   Widget build(BuildContext context){
+    final measurement = context.watch<DocsHolder>().current;
 
     if(measurement == null){ //check
       return Container(
@@ -88,16 +90,16 @@ class _UpperChartState extends State<UpperChartWidget>{
                   // First line
                   LineChartBarData(
                     spots: [
-                      FlSpot(9, measurement!.documents[0].values[0].toDouble()),
-                      FlSpot(8, measurement!.documents[1].values[0].toDouble()),
-                      FlSpot(7, measurement!.documents[2].values[0].toDouble()),
-                      FlSpot(6, measurement!.documents[3].values[0].toDouble()),
-                      FlSpot(5, measurement!.documents[4].values[0].toDouble()),
-                      FlSpot(4, measurement!.documents[5].values[0].toDouble()),
-                      FlSpot(3, measurement!.documents[6].values[0].toDouble()),
-                      FlSpot(2, measurement!.documents[7].values[0].toDouble()),
-                      FlSpot(1, measurement!.documents[8].values[0].toDouble()),
-                      FlSpot(0, measurement!.documents[9].values[0].toDouble()),
+                      FlSpot(9, measurement.documents[0].values[0].toDouble()),
+                      FlSpot(8, measurement.documents[1].values[0].toDouble()),
+                      FlSpot(7, measurement.documents[2].values[0].toDouble()),
+                      FlSpot(6, measurement.documents[3].values[0].toDouble()),
+                      FlSpot(5, measurement.documents[4].values[0].toDouble()),
+                      FlSpot(4, measurement.documents[5].values[0].toDouble()),
+                      FlSpot(3, measurement.documents[6].values[0].toDouble()),
+                      FlSpot(2, measurement.documents[7].values[0].toDouble()),
+                      FlSpot(1, measurement.documents[8].values[0].toDouble()),
+                      FlSpot(0, measurement.documents[9].values[0].toDouble()),
                     ],
                     preventCurveOverShooting: false,
                     curveSmoothness: 0.2,
@@ -132,7 +134,7 @@ class _UpperChartState extends State<UpperChartWidget>{
                           case 1:
                             return SizedBox(                             
                               width: 50,                             
-                              child: Text(upperGraphTime(value.toInt()),
+                              child: Text(upperGraphTime(context, value.toInt()),
                                 softWrap: true, 
                                 maxLines: 2, 
                                 textAlign: TextAlign.center,
@@ -146,7 +148,7 @@ class _UpperChartState extends State<UpperChartWidget>{
                           case 3:
                             return SizedBox(                             
                               width: 50,                             
-                              child: Text(upperGraphTime(value.toInt()),
+                              child: Text(upperGraphTime(context, value.toInt()),
                                 softWrap: true, 
                                 maxLines: 2, 
                                 textAlign: TextAlign.center,
@@ -160,7 +162,7 @@ class _UpperChartState extends State<UpperChartWidget>{
                           case 5:
                             return SizedBox(                             
                               width: 50,                             
-                              child: Text(upperGraphTime(value.toInt()),
+                              child: Text(upperGraphTime(context, value.toInt()),
                                 softWrap: true, 
                                 maxLines: 2, 
                                 textAlign: TextAlign.center,
@@ -174,7 +176,7 @@ class _UpperChartState extends State<UpperChartWidget>{
                           case 7:
                             return SizedBox(                             
                               width: 50,                             
-                              child: Text(upperGraphTime(value.toInt()),
+                              child: Text(upperGraphTime(context, value.toInt()),
                                 softWrap: true, 
                                 maxLines: 2, 
                                 textAlign: TextAlign.center,
@@ -188,7 +190,7 @@ class _UpperChartState extends State<UpperChartWidget>{
                           case 9:
                             return SizedBox(                             
                               width: 50,                             
-                              child: Text(upperGraphTime(value.toInt()),
+                              child: Text(upperGraphTime(context, value.toInt()),
                                 softWrap: true, 
                                 maxLines: 2, 
                                 textAlign: TextAlign.center,
@@ -233,14 +235,14 @@ class _UpperChartState extends State<UpperChartWidget>{
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            upperStatus(),
+            upperStatus(context),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text('Last Update:',
                   style: TextStyle(fontFamily: 'Onest', fontSize: 12, fontWeight: FontWeight.w400, color: const Color.fromARGB(255, 170, 170, 170))
                 ),
-                Text(upperGraphTime(0),
+                Text(upperGraphTime(context, 0),
                   style: TextStyle(fontFamily: 'Onest', fontSize: 16, fontWeight: FontWeight.w600, color: const Color.fromARGB(255, 170, 170, 170))
                 ),
               ],
@@ -248,7 +250,7 @@ class _UpperChartState extends State<UpperChartWidget>{
           ],
         ),
         SizedBox(height: 20,),
-        remainingTime(),
+        remainingTime(context),
       ],
       )
     );

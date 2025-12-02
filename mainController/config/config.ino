@@ -15,13 +15,13 @@ void setup(){
   pinMode(SUP_TRIG_PIN, OUTPUT);
   pinMode(SUP_ECHO_PIN, INPUT);
 
-  ledcAttach(ledPin, 5000, resolution);
+  //ledcAttach(ledPin, 5000, resolution);
 }
 
 void loop(){
   long raw_distance [MEASURE_NUM];
   float distance;
-  ledcWrite(ledPin, 255);
+  //ledcWrite(ledPin, 255);
   Serial.print("\n\nLower tank Ultrasonic Trigger is connected to pin ");
   Serial.println(SUP_TRIG_PIN);
   Serial.print("\nLower tank Ultrasonic ECHO is connected to pin ");
@@ -56,7 +56,7 @@ void loop(){
 
     Serial.print(distance/MEASURE_NUM);
     Serial.print("\n");
-    ledcWrite(ledPin, distance/MEASURE_NUM);
+   // ledcWrite(ledPin, distance/MEASURE_NUM);
 
     delay(300);
   }

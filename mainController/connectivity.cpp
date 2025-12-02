@@ -112,7 +112,7 @@ void update_cloud(){ //updates data on cloud (measurify)
     }
 
     //convert water level to percentage
-    int percentage = ((SUP_SENSOR_HI - sup_current_level)*100)/(SUP_SENSOR_HI - SUP_SENSOR_LO);
+    int percentage = (((SUP_SENSOR_HI - sup_current_level)*100)/(SUP_SENSOR_HI - SUP_SENSOR_LO));  //rounded to nearest
     
 
     http.addHeader("Content-Type", "application/json");
