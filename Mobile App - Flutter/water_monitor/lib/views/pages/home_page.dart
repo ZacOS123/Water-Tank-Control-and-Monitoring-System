@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:water_monitor/widgets/LowerTank_widget.dart';
+import 'package:water_monitor/widgets/lowerTank_widget.dart';
 import 'package:water_monitor/widgets/upperTank_widget.dart';
 
 
@@ -12,30 +12,14 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage>{
   
-  
-
   @override
   void initState() { 
     super.initState();
-    //getData();
   }
-/*
-  Future<void> firstRefresh() async{
-    await getData();
-    setState(() {});
-  }
-*/
 
   @override
   Widget build(BuildContext context){
-    return /*RefreshIndicator(
-      color: Theme.of(context).colorScheme.onPrimary,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      onRefresh: () async{
-        await getData();
-        setState(() {});
-      },
-      child:*/
+    return 
        ListView(
         physics: AlwaysScrollableScrollPhysics(),
         children: [Column(children: [
@@ -47,11 +31,10 @@ class _HomePageState extends State<HomePage>{
             ),
           ),
           UpperTankWidget(),
-          AccumulatorWidget(),
+          LowerTankWidget(),
           SizedBox(height: 30),
         ]
         ),]
       );
-    //);
   }
 }

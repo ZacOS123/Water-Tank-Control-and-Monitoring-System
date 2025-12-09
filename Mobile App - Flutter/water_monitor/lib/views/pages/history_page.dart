@@ -18,22 +18,10 @@ class _HistoryPage extends State<HistoryPage>{
   void initState() { 
     super.initState();
   }
-/*
-  Future<void> firstRefresh() async{
-    await getData();
-    setState(() {});
-  }
-*/
+
   @override
   Widget build(BuildContext context){
-    return /*RefreshIndicator.adaptive(
-      color: Theme.of(context).colorScheme.onPrimary,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      onRefresh: () async{
-        await getData();
-        setState(() {});
-      },
-      child:*/ ListView(
+    return ListView(
         physics: AlwaysScrollableScrollPhysics(),
         children:[ Column(children: [
           Text('History', style: TextStyle(

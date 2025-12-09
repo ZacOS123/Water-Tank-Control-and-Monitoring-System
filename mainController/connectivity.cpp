@@ -6,84 +6,111 @@
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 
-/*
-int BLE_scan_and_connect(){ //Scans and connects to inf tank. returns -1 for error, 0 for success
 
-  NimBLEScan *pScan = NimBLEDevice::getScan();
-  Serial.println("Scanning BLE devices...");
-  NimBLEScanResults results = pScan->getResults(20 * 1000);  //scan for 15 secs
-  int result_count = results.getCount();
-  for (int i = 0; i < result_count; i++) {
-    const NimBLEAdvertisedDevice *device = results.getDevice(i);
+////BLE /////
 
-    //Server found//
-    if (device != nullptr){
-      if (device->isAdvertisingService(serviceUuid)) {
-        pClient = NimBLEDevice::createClient();
-        Serial.println("Lower tank system found!");
-        if (!pClient) { // client not created
-          Serial.println("Unable to initiate connection: unable to create client (locally).");
-          return -1;
-        }
-        else{
-          if (pClient->connect(&device)) {  //if was able to connect 
-            pService = pClient->getService(serviceUuid);
-            Serial.println("Connected to lower tank system!");
+// Characteristic and server pointers
+static NimBLEClient *pClient;
+static NimBLERemoteCharacteristic* pInfLevel;
+static NimBLERemoteCharacteristic* pErrorFlags;
 
-            return 0;
-          }
-          else { //if wasnt able to connect
-            Serial.println("Failed to connect to server.");
-            return -1;
-          }
-        }
-      }
-    } 
-
-    //Server not found//
-    Serial.println("Could not find BLE server.");
-    return -1;
-    
+void infLevelNotifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* data, size_t length, bool isNotify){
+  if (length >= sizeof(int)) {
+      // Server sent a full int (4 bytes on ESP32)
+      memcpy(&inf_current_level, data, sizeof(int));
+  } else if (length == 1) {
+      // Server sent only a single byte representing percentage
+      inf_current_level = data[0];
   }
-} 
+  Serial.print("inf_current_level updated: ");
+  Serial.println(inf_current_level);
+}
 
-//////////////////////////////////////////////////////////////////////////
+void errorFlagsNotifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* data, size_t length, bool isNotify){
+  if (length >= sizeof(uint16_t)) {
+      // Copy 2 bytes from BLE notification to the global variable
+      memcpy(&inf_errors, data, sizeof(uint16_t));
+  } else if (length == 1) {
+      // Sometimes server may send only 1 byte
+      inf_errors = data[0];
+  }
+  Serial.print("inf_errors updated: ");
+  Serial.println(inf_errors);
+}
 
-int get_inf_data (){  //returns inferior tank water level
-  if(pClient != nullptr){
-    if(pClient->isConnected()){ //if BLE connected
-      if (pService != nullptr) {
-        pInf_level = pService->getCharacteristic("74ac19c2-5aa1-4419-9426-dab1961d0b9f1");
-        pError_flags = pService->getCharacteristic("74ac19c2-5aa1-4419-9426-dab1961d0b9f2");
+int search_and_connect (NimBLEScanResults results){  //return 0 for error, 1 for success
+  for (int i = 0; i < results.getCount(); i++) {
+    const NimBLEAdvertisedDevice *device = results.getDevice(i);
+    if(!device){
+      Serial.println ("No device Found.");
+      return 0;
+    }
+    if (device->isAdvertisingService(serviceUUID)) {
+      pClient = NimBLEDevice::createClient();
 
-        if(pError_flags != nullptr){
-          std::string value = pError_flags->readValue();
-          inf_errors = value[0];  //LSB = SENSOR_ERROR.    2nd LSB = SOURCE_ERROR
+      if (!pClient) { // Make sure the client was created
+          return 0;
+      }
+
+      if (pClient->connect(&device)) {
+          NimBLERemoteService *pService = pClient->getService(serviceUUID);
+        if(!pService){
+          Serial.println("BLE Error: could not find service.");
+          pClient->disconnect();         
+          return 0;
         }
-        else{
-          Serial.println("Could not store lower tank error flags: can't create BLE characteristic (locally).");
-        }
+        else {
+          pInfLevel = pService->getCharacteristic(infLevelUUID);
+          pErrorFlags = pService->getCharacteristic(errorFlagsUUID);
 
-        if (pInf_level != nullptr && !(inf_errors & 0x01)) {  //if char exists and no sensor error
-          std::string value = pInf_level->readValue();
-          inf_current_level = value[0];
-        }
-            else{
-          Serial.println("Could not store lower tank water level: can't create BLE characteristic (locally).");
+          if (pInfLevel && pInfLevel->canNotify()) {
+            pInfLevel->subscribe(true, infLevelNotifyCB);
+            Serial.println("Subscribed to infLevel notifications");
+          }
+          if (pErrorFlags && pErrorFlags->canNotify()) {
+            pErrorFlags->subscribe(true, errorFlagsNotifyCB);
+            Serial.println("Subscribed to errorFlags notifications");
+          }
+          return 1;
         }
       }
-      else{
-        Serial.println("Could not access lower tank data: can't create BLE service (locally).");
+      else {
+        pClient->disconnect(); // failed to connect
       }
     }
+    Serial.println ("Device not found!");
+    return 0;
   }
-} 
-*/
-//////////////////////////////////////////////////////////////////////////
+}
+
+class ClientCallbacks : public NimBLEClientCallbacks {
+public:
+    void onConnect(NimBLEClient* pClient) override {
+        Serial.println("Connected to server");
+    }
+
+    void onDisconnect(NimBLEClient* pClient, int reason) override {
+        Serial.print("Disconnected! Reason: ");
+        Serial.println(reason);
+
+        // Clear characteristic pointers
+        pInfLevelChar = nullptr;
+        pErrorFlagsChar = nullptr;
+
+        // Restart scanning to find the server again
+        NimBLEDevice::getScan()->start(0, false);
+        Serial.println("Restarted scanning...");
+    }
+};
+
+
+////////////////////////////////////////////////////
+
+
+
+
 
 //// WiFi and Cloud ////
-
-////////////////////////////////////////////////////////////////////////////
 
 void update_cloud(){ //updates data on cloud (measurify)
   if(!WIFI_ERROR && millis() - update_time >= TIME_TO_UPDATE){
@@ -109,8 +136,11 @@ void update_cloud(){ //updates data on cloud (measurify)
     }
     if(status == PUMPING){
       sup_errors |= 0x08;
+      if(millis() - pump_time >= TIME_TO_CHECK){
+        sup_errors |= (  ((sup_current_level - SUP_SENSOR_LO) / (sup_level_at_start - sup_current_level)) * TIME_TO_CHECK) << 8;
+      }
     }
-
+    
     //convert water level to percentage
     int percentage = (((SUP_SENSOR_HI - sup_current_level)*100)/(SUP_SENSOR_HI - SUP_SENSOR_LO));  //rounded to nearest
     

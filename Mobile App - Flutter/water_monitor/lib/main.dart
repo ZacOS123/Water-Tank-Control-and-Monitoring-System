@@ -1,16 +1,25 @@
 
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:water_monitor/data/notifiers.dart';
 import 'package:water_monitor/views/widget_tree.dart';
+import 'package:provider/provider.dart';
 import 'package:water_monitor/data/classes.dart';
 
 
+
+
 void main() {
-  runApp(ChangeNotifierProvider(
-      create: (_) => DocsHolder(),   // starts auto-refresh inside constructor
-      child: const MyApp(),
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => DocsHolder_A(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DocsHolder_B(),
+        ),
+      ],
+      child: MyApp(),
     ),);
 }
 

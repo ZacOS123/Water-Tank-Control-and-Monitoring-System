@@ -38,25 +38,19 @@ void handle_error(){
     SENSOR_ERROR = false;
   }
 
-/*
-  //Check BLE if BLE_ERROR is true//
-  if (BLE_ERROR){
-    status = BLOCKING_ERROR;
-    if(pClient != nullptr){
-      if (pClient->isConnected()) {
-        get_inf_data();
-      }
+  //checks BLE//
+  if(BLE_ERROR){
+    NimBLEDevice::deleteClient(pClient);
+    NimBLEScan* pScan = NimBLEDevice::getScan();
+    NimBLEScanResults results = pScan->getResults(10 * 1000); // continuous scan
+    
+    if(search_and_connect(results) == 1){
+      BLE_ERROR = false;
     }
-    else {
-      if (BLE_scan_and_connect() == 0){
-        BLE_ERROR = false;
-      }
-      else{
-        BLE_ERROR = true;
-      }
+    else{
+      BLE_ERROR = true;
     }
   }
-*/
 
 }
 

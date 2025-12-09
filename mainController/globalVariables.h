@@ -20,17 +20,15 @@ extern unsigned long pump_time;  //in milliseconds, used to check if the system 
 extern int sup_level_at_start; //air level in sup tank when the pump started
 extern int inf_current_level;  //saves the lower tank's air level for the current loop
 extern int sup_current_level;  //saves the upper tank's air level for the current loop
-extern uint8_t inf_errors; //saves error flags: bit 0 = SENSOR_ERROR, bit 1 = SOURCE_ERROR,
+extern uint16_t inf_errors; //saves error flags: bit 0 = SENSOR_ERROR, bit 1 = SOURCE_ERROR,
 
 extern const char* ssid;
 extern const char* password;
-/*
-extern NimBLEClient *pClient;
-extern NimBLERemoteService *pService;
-extern NimBLERemoteCharacteristic *pInf_level;
-extern NimBLERemoteCharacteristic *pError_flags;
-extern NimBLEUUID serviceUuid;
-*/
+
+extern NimBLEUUID serviceUUID;
+extern NimBLEUUID infLevelUUID;
+extern NimBLEUUID errorFlagsUUID;
+
 extern bool SENSOR_ERROR;
 extern bool PUMP_ERROR;
 extern bool BLE_ERROR;

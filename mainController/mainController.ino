@@ -64,14 +64,19 @@ void setup(){
 
  
   ////////Bluetooth connection setup////////
-/*  NimBLEDevice::init("supTank");
-  if (BLE_scan_and_connect() == 0){
+  Serial.println("Starting BLE");
+
+  NimBLEDevice::init("supTank");
+
+  NimBLEScan* pScan = NimBLEDevice::getScan();
+  NimBLEScanResults results = pScan->getResults(10 * 1000); // continuous scan
+  
+  if(search_and_connect(results) == 1){
     BLE_ERROR = false;
   }
   else{
     BLE_ERROR = true;
   }
-*/
 }
 
 

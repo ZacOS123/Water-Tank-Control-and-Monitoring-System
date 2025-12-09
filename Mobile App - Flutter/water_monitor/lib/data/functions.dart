@@ -1,38 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:water_monitor/data/classes.dart';
-import 'package:provider/provider.dart';
-
-/*
-Future getData() async {
-
-    // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(
-      url, 
-      headers: {
-        'Authorization': '$token',
-        'Content-Type': 'application/json',
-      },
-    );
-    
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = jsonDecode(response.body);
-      measurement = Docs.fromJson(jsonData);
-      print(measurement!.documents[0].values[0]);
-      return measurement;
-    }
-    else {
-      print('Request failed with status: ${response.statusCode}.');
-      return null;
-    }
-  }*/
-
-
-
   
-
-Widget upperPercentage (BuildContext context){
-  final measurement = context.watch<DocsHolder>().current;
+  
+Widget percentage (BuildContext context, Docs? measurement){
+  //final measurement = context.watch<DocsHolder>().current;
   Widget returnedWidget = Text(
               '--', 
               style: TextStyle(
@@ -64,10 +36,7 @@ Widget upperPercentage (BuildContext context){
 
 ////////////////////////////////////////
 
-Widget upperStatus(BuildContext context){
-
-  final measurement = context.watch<DocsHolder>().current;
-
+Widget upperStatus(BuildContext context, Docs? measurement){
 
   if(measurement == null){
     return SizedBox(height: 2.0);
@@ -140,13 +109,89 @@ Widget upperStatus(BuildContext context){
           );
 }
 
+///////////////////////////
+
+Widget lowerStatus(BuildContext context, Docs? measurement){
+
+  if(measurement == null){
+    return SizedBox(height: 2.0);
+  }
+  else if(measurement.documents[0].values[1] & 0x08 == 8){ //if pumping
+    return Row(
+            spacing: 7,
+            children: [
+              Icon(Icons.pending, color: Color.fromARGB(255, 58, 110, 255), size: 26),
+              Text('Filling', style: TextStyle(fontFamily: 'Onest',fontSize: 20, fontWeight: FontWeight.w700),),
+            ],
+          );
+  }
+  else if(measurement.documents[0].values[1] & 0x01 == 1){ //sensor error
+    return Column(
+      children: [
+        Row(
+            spacing: 7,
+            children: [
+              Icon(Icons.error, color: Colors.red, size: 20),
+              Text('Sensor Error', style: TextStyle(fontFamily: 'Onest', fontSize: 15, fontWeight: FontWeight.w500, color: Colors.red),),
+            ],
+          ),
+        SizedBox(height: 10),
+        Container(
+          width: 125,
+          child: Text('Showing last valid water level.', style: TextStyle(fontFamily: 'Onest', fontSize: 12, fontWeight: FontWeight.w400, color: const Color.fromARGB(255, 131, 131, 131)), softWrap: true,)),
+      ],
+    );
+  }
+  else if(measurement.documents[0].values[1] & 0x02 == 2){  //pump error
+    return Row(
+              spacing: 7,
+              children: [
+                Icon(Icons.error, color: Colors.red, size: 26),
+                SizedBox(
+                  width: 125,
+                  child: Text('Can\'t accumulate water', 
+                    style: TextStyle(fontFamily: 'Onest',fontSize: 14, fontWeight: FontWeight.w500, color: Colors.red),
+                    softWrap: true
+                  ),
+                ),
+              ],
+            );
+  }
+  else if(measurement.documents[0].values[1] & 0x04 == 4){  //pump error
+    return Row(
+              spacing: 7,
+              children: [
+                Icon(Icons.bluetooth_disabled, color: Colors.red, size: 23),
+                Text('Can\'t Fill', style: TextStyle(fontFamily: 'Onest',fontSize: 15, fontWeight: FontWeight.w500, color: Colors.red),),
+              ],
+            );
+  }
+  else if(measurement.documents[0].values[0] == 100){
+    return Row(
+              spacing: 7,
+              children: [
+                Icon(Icons.check_circle, color: Color.fromARGB(255, 74, 209, 1), size: 25),
+                Text('Full', style: TextStyle(fontFamily: 'Onest',fontSize: 20, fontWeight: FontWeight.w700),),
+              ],
+            );
+  }
+  return Row(
+            spacing: 7,
+            children: [
+              Icon(Icons.pause_circle_filled, color: const Color.fromARGB(255, 228, 201, 0), size: 25),
+              Text('Waiting', style: TextStyle(fontFamily: 'Onest',fontSize: 20, fontWeight: FontWeight.w600), softWrap: true,),
+            ],
+          );
+}
+
 ////////////////////////////
 
-Border upperBoarder (BuildContext context){
+Border border (BuildContext context, Docs? measurement){
 
-  final measurement = context.watch<DocsHolder>().current;
+  //final measurement = context.watch<DocsHolder>().current;
 
   if(measurement != null){
+
     if(measurement.documents[0].values[1] & 0x02 == 2 ||
      measurement.documents[0].values[1] & 0x01 == 1 ||
      measurement.documents[0].values[1] & 0x04 == 4){
@@ -159,9 +204,7 @@ Border upperBoarder (BuildContext context){
 
 ////////////////
 
-Widget upperHeight (BuildContext context){
-
-  final measurement = context.watch<DocsHolder>().current;
+Widget height (BuildContext context, Docs? measurement){
 
   if(measurement != null){
     if(measurement.documents[0].values[1] & 0x01 != 1){
@@ -188,9 +231,7 @@ Widget upperHeight (BuildContext context){
 
 //////////////
 
-String upperGraphTime(BuildContext context, int n) {
-
-  final measurement = context.watch<DocsHolder>().current;
+String graphTime(BuildContext context, Docs? measurement, int n) {
 
   if(measurement != null){
     DateTime dt = measurement.documents[9-n].timestamp;
@@ -202,9 +243,7 @@ String upperGraphTime(BuildContext context, int n) {
   }
 }
 
-Widget remainingTime(BuildContext context){
-
-  final measurement = context.watch<DocsHolder>().current;
+Widget remainingTime(BuildContext context, Docs? measurement){
 
   if(measurement != null){
     int time = (measurement.documents[0].values[1] & 0x0000FF00) >> 8;

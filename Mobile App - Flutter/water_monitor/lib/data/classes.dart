@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'constants.dart';
+import 'package:water_monitor/data/constants.dart';
 
 
 class Docs {
@@ -45,7 +45,7 @@ class Docs {
         hasPrevPage: json['hasPrevPage'] as bool,
         hasNextPage: json['hasNextPage'] as bool,
         prevPage: json['prevPage'] as int?,
-        nextPage: json['nextPage'] as int,
+        nextPage: json['nextPage'] ?? 0,
       ),
       _ => throw const FormatException('Failed to load docs.'),
     };
@@ -84,13 +84,14 @@ class MeasurementData {
   }
 }
 
-class DocsHolder extends ChangeNotifier {
+class DocsHolder_A extends ChangeNotifier {
+
   Docs? _current;
   Timer? _timer;
 
   Docs? get current => _current;
 
-  DocsHolder() {
+  DocsHolder_A() {
     _startAutoRefresh();
   }
 
@@ -101,9 +102,48 @@ class DocsHolder extends ChangeNotifier {
 
   Future<void> fetchDocs() async {
     final response = await http.get(
-      url, 
+      url_A, 
       headers: {
-        'Authorization': token,
+        'Authorization': token_A,
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      _current = Docs.fromJson(json.decode(response.body));
+      notifyListeners();
+    }
+    else{
+      print('http error code: ${response.statusCode}');
+    }
+  }
+
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+class DocsHolder_B extends ChangeNotifier {
+
+  Docs? _current;
+  Timer? _timer;
+
+  Docs? get current => _current;
+
+  DocsHolder_B() {
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    fetchDocs();
+    _timer = Timer.periodic(Duration(seconds: 2), (_) => fetchDocs());
+  }
+
+  Future<void> fetchDocs() async {
+    final response = await http.get(
+      url_B, 
+      headers: {
+        'Authorization': token_B,
         'Content-Type': 'application/json',
       },
     );

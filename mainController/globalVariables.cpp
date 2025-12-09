@@ -12,18 +12,21 @@ int sup_level_at_start; //water level in sup tank when the pump started
 
 int inf_current_level;  //saves the lower tank's water level for the current loop
 int sup_current_level;  //saves the upper tank's water level for the current loop
-uint8_t inf_errors = 0x03;  //saves lower controller and tank status
+uint16_t inf_errors = 0x03;  //saves lower controller and tank status
+
 
 // WiFi credentials
 const char* ssid = "Zahi's A32";
 const char* password = "luciusmalfoy333";
-/*
-NimBLEClient *pClient = nullptr;
-NimBLERemoteService *pService = nullptr;
-NimBLERemoteCharacteristic *pInf_level = nullptr;
-NimBLERemoteCharacteristic *pError_flags = nullptr;
-NimBLEUUID serviceUuid("74ac19c2-5aa1-4419-9426-dab1961d0b9f");
-*/
+
+
+//BLE UUIDs//
+NimBLEUUID serviceUUID("74ac19c2-5aa1-4419-9426-dab1961d0b9f");
+NimBLEUUID infLevelUUID("74ac19c2-5aa1-4419-9426-dab1961d0b91");
+NimBLEUUID errorFlagsUUID("74ac19c2-5aa1-4419-9426-dab1961d0b92");
+
+
+//Error Flags//
 bool SENSOR_ERROR = true;
 bool PUMP_ERROR = false;
 bool BLE_ERROR = true;
