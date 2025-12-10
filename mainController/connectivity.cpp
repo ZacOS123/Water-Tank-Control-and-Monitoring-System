@@ -9,11 +9,6 @@
 
 ////BLE /////
 
-// Characteristic and server pointers
-static NimBLEClient *pClient;
-static NimBLERemoteCharacteristic* pInfLevel;
-static NimBLERemoteCharacteristic* pErrorFlags;
-
 void infLevelNotifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* data, size_t length, bool isNotify){
   if (length >= sizeof(int)) {
       // Server sent a full int (4 bytes on ESP32)
@@ -83,28 +78,22 @@ int search_and_connect (NimBLEScanResults results){  //return 0 for error, 1 for
   }
 }
 
-class ClientCallbacks : public NimBLEClientCallbacks {
-public:
-    void onConnect(NimBLEClient* pClient) override {
-        Serial.println("Connected to server");
-    }
+void onConnect(NimBLEClient* pClient){
+  Serial.println("Connected to server");
+}
 
-    void onDisconnect(NimBLEClient* pClient, int reason) override {
-        Serial.print("Disconnected! Reason: ");
-        Serial.println(reason);
+void onDisconnect(NimBLEClient* pClient, int reason){
+  Serial.print("BLE Disconnected! Reason: ");
+  Serial.println(reason);
 
-        // Clear characteristic pointers
-        pInfLevelChar = nullptr;
-        pErrorFlagsChar = nullptr;
+  // Clear characteristic pointers
+  pInfLevel = nullptr;
+  pErrorFlags = nullptr;
 
-        // Restart scanning to find the server again
-        NimBLEDevice::getScan()->start(0, false);
-        Serial.println("Restarted scanning...");
-    }
-};
+  BLE_ERROR = true;
+}
 
-
-////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -115,12 +104,14 @@ public:
 void update_cloud(){ //updates data on cloud (measurify)
   if(!WIFI_ERROR && millis() - update_time >= TIME_TO_UPDATE){
     update_time = millis();
-    Serial.println("Updating cloud data...");
+
+    //upper update//
+    Serial.println("Updating upper cloud data...");
     HTTPClient http;
     WiFiClientSecure client;
     client.setInsecure();   // used for https instead of http
     if(!http.begin("https://tracker.elioslab.net/v1/measurements/Livello_acqua_A/timeserie")){
-      Serial.println("HTTP error: Couldn't prepare connection");
+      Serial.println("HTTP error: Couldn't prepare connection to update upper data");
     }
     
     //sup error flags build
@@ -161,7 +152,40 @@ void update_cloud(){ //updates data on cloud (measurify)
       Serial.println("Response code: " + String(httpCode));
     }
     else {
-      Serial.println("POST failed");
+      Serial.println("POST failed for upper tank");
+      Serial.print("Response code: ");
+      Serial.println(httpCode);
+    }
+    http.end();
+  }
+
+  ///////////////////////////////
+
+  //Lower update//
+  if(!BLE_ERROR){
+    Serial.println("Updating lower cloud data...");
+    HTTPClient http;
+    WiFiClientSecure client;
+    client.setInsecure();   // used for https instead of http
+    if(!http.begin("https://tracker.elioslab.net/v1/measurements/Livello_acqua_B/timeserie")){
+      Serial.println("HTTP error: Couldn't prepare connection to update lower data.");
+    }
+
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "DVC eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2UiOnsiX2lkIjoiRGlzcG9zaXRpdm8yIiwiZmVhdHVyZXMiOlsiTGl2ZWxsb19BY3F1YSJdLCJ0aGluZ3MiOlsiQ2lzdGVybmFBIiwiQ2lzdGVybmFCIl0sInZpc2liaWxpdHkiOiJwdWJsaWMiLCJvd25lciI6IjY5MWQ5OGZlNGEzYmY4MDAxZWJhMTVhMCJ9LCJ0ZW5hbnQiOnsicGFzc3dvcmRoYXNoIjp0cnVlLCJfaWQiOiJ3YXRlcl9jb250cm9sIiwib3JnYW5pemF0aW9uIjoiTWVhc3VyaWZ5IG9yZyIsImFkZHJlc3MiOiJNZWFzdXJpZnkgU3RyZWV0LCBHZW5vdmEiLCJlbWFpbCI6ImluZm9AbWVhc3VyaWZ5Lm9yZyIsInBob25lIjoiKzM5MTAzMjE4NzkzODE3IiwiZGF0YWJhc2UiOiJ3YXRlcl9jb250cm9sIn0sImlhdCI6MTc2MzczNDY3NSwiZXhwIjozMzMyMTMzNDY3NX0.1I2qC0J_3iqa8g6ZOA_XaOZgMP0olMLKidkeDvKZX_k");
+
+    // json string build
+    String json = "{";
+    json += "\"timestamp\": \"" + String((now*1000) + (millis() - sync_time)) + "\","; 
+    json += "\"values\": [" + String(inf_current_level) + ", " + String(inf_errors) + "]";
+    json += "}";
+
+    int httpCode = http.POST(json);
+    if (httpCode > 0) {
+      Serial.println("Response code: " + String(httpCode));
+    }
+    else {
+      Serial.println("POST failed for lower tank");
       Serial.print("Response code: ");
       Serial.println(httpCode);
     }

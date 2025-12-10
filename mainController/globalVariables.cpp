@@ -25,6 +25,11 @@ NimBLEUUID serviceUUID("74ac19c2-5aa1-4419-9426-dab1961d0b9f");
 NimBLEUUID infLevelUUID("74ac19c2-5aa1-4419-9426-dab1961d0b91");
 NimBLEUUID errorFlagsUUID("74ac19c2-5aa1-4419-9426-dab1961d0b92");
 
+// Characteristic and server pointers
+NimBLEClient *pClient = nullptr;
+NimBLERemoteCharacteristic* pInfLevel = nullptr;
+NimBLERemoteCharacteristic* pErrorFlags = nullptr;
+
 
 //Error Flags//
 bool SENSOR_ERROR = true;

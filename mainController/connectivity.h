@@ -7,11 +7,14 @@
 int search_and_connect (NimBLEScanResults res);
 void infLevelNotifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* data, size_t length, bool isNotify);
 void errorFlagsNotifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* data, size_t length, bool isNotify);
+
 class ClientCallbacks : public NimBLEClientCallbacks {
 public:
     void onConnect(NimBLEClient* pClient) override;
     void onDisconnect(NimBLEClient* pClient, int reason) override;
-}
+};
+
+
 
 
 //// WiFi and Cloud ////

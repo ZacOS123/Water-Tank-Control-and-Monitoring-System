@@ -28,6 +28,10 @@ extern const char* password;
 extern NimBLEUUID serviceUUID;
 extern NimBLEUUID infLevelUUID;
 extern NimBLEUUID errorFlagsUUID;
+// Characteristic and server pointers
+extern NimBLEClient *pClient;
+extern NimBLERemoteCharacteristic* pInfLevel;
+extern NimBLERemoteCharacteristic* pErrorFlags;
 
 extern bool SENSOR_ERROR;
 extern bool PUMP_ERROR;
