@@ -9,7 +9,9 @@
 #include <WiFi.h>
 
 void setup(){
-  Serial.begin(9600);
+  delay(1000); //startup delay for power stability
+
+  Serial.begin(115200);
   Serial.println(" ");
   Serial.println("Hello!");
 
@@ -35,36 +37,10 @@ void setup(){
   WiFi.mode(WIFI_STA);
   WiFi.onEvent(WiFi_error_handler);
   WiFi.begin(ssid, password);
-  
-
-  wl_status_t wifi_status; //saves wifi status for current loop (as enum in wifi.h)
-  for(int k=0; k<10; k++) {
-    wifi_status = WiFi.status();
-    if(wifi_status == WL_CONNECTED){
-      WIFI_ERROR = false;
-      Serial.println("WiFi connected!");
-
-      //get current time
-      Serial.println("Getting date and time... ");
-      configTime(0, 0, "pool.ntp.org");
-      while(now < 20){
-        now = time(nullptr);
-      }
-      Serial.println("Done!");
-      sync_time = millis();
-      break;
-    }
-    delay(1000);
-    Serial.print(".");
-    if(k == 9 && wifi_status != WL_CONNECTED){
-      WIFI_ERROR = true;
-      Serial.println("Unable to connect! (System will keep retrying...)");
-    }
-  }
 
  
   ////////Bluetooth connection setup////////
-  Serial.println("Starting BLE");
+  Serial.println("Starting BLE and searching for InfTank");
 
   NimBLEDevice::init("supTank");
 

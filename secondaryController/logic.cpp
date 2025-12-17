@@ -1,7 +1,7 @@
 #include "control.h"
 #include "globalVariables.h"
 #include "config/config.h"
-#include <Arduino.h>
+#include <NimBLEDevice.h>
 
 
 void handle_lower_tank (){
@@ -37,17 +37,30 @@ void handle_error(){
 //////////////////////////////////////////////////////////////////////
 
 void handle_communication(){
-  BLE.poll();
-  if(millis() - BLE_time >= TIME_TO_UPDATE){ // updates data every [TIME_TO_UPDATE]
-    if(update_data_BLE() == -1){
-      BLE_ERROR = true;
+  if(millis() - BLE_time >= TIME_TO_UPDATE){
+    BLE_time = millis();
+
+    //build error flags//
+    uint16_t error_flags = 0;
+    if(SENSOR_ERROR){
+      error_flags |= 0x01;
     }
-    else{
-      BLE_ERROR = false;
-      Serial.println("BLE data updated!");
+    if(SOURCE_ERROR){
+      error_flags |= 0x02;
     }
-  } 
+    if(status == FILLING){
+      if(millis() - source_time >= TIME_TO_CHECK){
+        error_flags |= ( ((inf_current_level - INF_SENSOR_LO) / (inf_level_at_start - inf_current_level)) * TIME_TO_CHECK ) << 8;
+      }
+    }
+    pInfLevel->setValue((uint8_t)inf_current_level); 
+    pErrorFlags->setValue(error_flags); 
+    pInfLevel->indicate();
+    pErrorFlags->indicate();
+    Serial.println("Updated data via BLE.");
+  }
 }
+  
 
 //////////////////////////////////////////////////////////////////////
 
@@ -63,9 +76,6 @@ void log(){
         }
         else if(SOURCE_ERROR){
           Serial.println("Source error.\nSystem operation will continue if water is present.");
-        }
-        else if(BLE_ERROR){
-          Serial.println("Bluetooth connection lost.\nTrying to reconnect...");
         }
         break;
     }

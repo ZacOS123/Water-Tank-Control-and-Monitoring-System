@@ -42,7 +42,7 @@ void handle_error(){
   if(BLE_ERROR){
     NimBLEDevice::deleteClient(pClient);
     NimBLEScan* pScan = NimBLEDevice::getScan();
-    NimBLEScanResults results = pScan->getResults(10 * 1000); // continuous scan
+    NimBLEScanResults results = pScan->getResults(10 * 1000);
     
     if(search_and_connect(results) == 1){
       BLE_ERROR = false;
@@ -51,7 +51,6 @@ void handle_error(){
       BLE_ERROR = true;
     }
   }
-
 }
 
 /////////////////////////////////

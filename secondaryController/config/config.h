@@ -3,14 +3,14 @@
 #define CONFIG_H //Prevents double definitions
 
 /////PIN SETUP///////
-#define INF_TRIG_PIN 5 //Ultraasonic trigger pin for lower tank
-#define INF_ECHO_PIN 6 //Ultrasonic echo pin for lower tank
+#define INF_TRIG_PIN 13 //Ultraasonic trigger pin for lower tank
+#define INF_ECHO_PIN 14 //Ultrasonic echo pin for lower tank
 
 
 #define MEASURE_NUM 1 //Number of ultrasonic reading before calculating the mean (for accurate reading)
                       //Big numbers take more time!
 
-#define SOURCE_PIN 11 //pin connected to the spring water valve
+#define SOURCE_PIN 27 //pin connected to the spring water valve
 
 /////MAX/MIN TANK LEVELS/////
 /// ! VALUES ARE INVERTED DUE TO ULTRASONIC TOP TO BOTTOM MEASUREMENT ! ////

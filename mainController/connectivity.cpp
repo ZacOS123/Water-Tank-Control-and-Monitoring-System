@@ -40,14 +40,16 @@ int search_and_connect (NimBLEScanResults results){  //return 0 for error, 1 for
       Serial.println ("No device Found.");
       return 0;
     }
+    
     if (device->isAdvertisingService(serviceUUID)) {
+      Serial.println("Checking BLE devices...");
       pClient = NimBLEDevice::createClient();
 
       if (!pClient) { // Make sure the client was created
           return 0;
       }
 
-      if (pClient->connect(&device)) {
+      if (pClient->connect(device)) {
           NimBLERemoteService *pService = pClient->getService(serviceUUID);
         if(!pService){
           Serial.println("BLE Error: could not find service.");
@@ -58,12 +60,12 @@ int search_and_connect (NimBLEScanResults results){  //return 0 for error, 1 for
           pInfLevel = pService->getCharacteristic(infLevelUUID);
           pErrorFlags = pService->getCharacteristic(errorFlagsUUID);
 
-          if (pInfLevel && pInfLevel->canNotify()) {
-            pInfLevel->subscribe(true, infLevelNotifyCB);
+          if (pInfLevel && pInfLevel->canIndicate()) {
+            pInfLevel->subscribe(true, infLevelNotifyCB, true);
             Serial.println("Subscribed to infLevel notifications");
           }
-          if (pErrorFlags && pErrorFlags->canNotify()) {
-            pErrorFlags->subscribe(true, errorFlagsNotifyCB);
+          if (pErrorFlags && pErrorFlags->canIndicate()) {
+            pErrorFlags->subscribe(true, errorFlagsNotifyCB, true);
             Serial.println("Subscribed to errorFlags notifications");
           }
           return 1;
@@ -73,9 +75,9 @@ int search_and_connect (NimBLEScanResults results){  //return 0 for error, 1 for
         pClient->disconnect(); // failed to connect
       }
     }
-    Serial.println ("Device not found!");
-    return 0;
   }
+  Serial.println ("InfTank BLE not found!");
+  return 0;
 }
 
 void onConnect(NimBLEClient* pClient){
@@ -128,7 +130,7 @@ void update_cloud(){ //updates data on cloud (measurify)
     if(status == PUMPING){
       sup_errors |= 0x08;
       if(millis() - pump_time >= TIME_TO_CHECK){
-        sup_errors |= (  ((sup_current_level - SUP_SENSOR_LO) / (sup_level_at_start - sup_current_level)) * TIME_TO_CHECK) << 8;
+        sup_errors |= ( ((sup_current_level - SUP_SENSOR_LO) / (sup_level_at_start - sup_current_level)) * TIME_TO_CHECK ) << 8;
       }
     }
     
@@ -197,14 +199,21 @@ void update_cloud(){ //updates data on cloud (measurify)
 
 void WiFi_error_handler(WiFiEvent_t event, WiFiEventInfo_t info){ //checks if wifi is still connected
   switch (event) {
-    case IP_EVENT_STA_GOT_IP:
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
       WIFI_ERROR = false;
-      Serial.println("WiFi connected");
+      Serial.println("WiFi connected!");
+      //get current time
+      Serial.println("Getting date and time... ");
+      configTime(0, 0, "pool.ntp.org");
+      while(now < 20){
+      now = time(nullptr);
+      }
+      Serial.println("Done!");
+      sync_time = millis();
       break;
 
-    case WIFI_EVENT_STA_DISCONNECTED:
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
       WIFI_ERROR = true;
-      Serial.println("WiFi disconnected");
       break;
   }
 }

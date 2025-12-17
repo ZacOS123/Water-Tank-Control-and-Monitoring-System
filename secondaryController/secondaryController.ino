@@ -4,16 +4,51 @@
 #include "config/config.h"
 #include "globalVariables.h"
 #include "logic.h"
-#include <ArduinoBLE.h>
+#include <NimBLEDevice.h>
 
 
 
-void setup()
-{
-  Serial.begin(9600);
-  while (!Serial);
-  Serial.println("Hello!");
+void setup(){
+  delay(1000);
+  Serial.begin(115200);
+  while(!Serial) {
+    delay(10);
+  }
+  Serial.println("\nHello!");
 
+  //Bluetooth setup
+  NimBLEDevice::init("InfTank");// Initialize NimBLE
+  NimBLEServer* pServer = NimBLEDevice::createServer();// Create BLE server
+  NimBLEService* pService = pServer->createService("74ac19c2-5aa1-4419-9426-dab1961d0b9f");// Create a service
+  if(!pService){
+    Serial.print("Couldn't create Service");
+  }
+  else{
+    pInfLevel = pService->createCharacteristic( // Create a characteristic (read + write)
+                            "74ac19c2-5aa1-4419-9426-dab1961d0b91",
+                            NIMBLE_PROPERTY::INDICATE
+                        );
+    pErrorFlags = pService->createCharacteristic( // Create a characteristic (read + write)
+                          "74ac19c2-5aa1-4419-9426-dab1961d0b92",
+                          NIMBLE_PROPERTY::INDICATE
+                        );
+    if(pInfLevel == nullptr){Serial.print("could not initialize characteristic");}
+
+    pInfLevel->setValue((uint8_t) 0); // Set initial value
+    pErrorFlags->setValue((uint16_t) 0); // Set initial value
+    pService->start(); // Start the service
+    NimBLEAdvertising* pAdvertising = NimBLEDevice::getAdvertising(); // Start advertising
+    pAdvertising->addServiceUUID("74ac19c2-5aa1-4419-9426-dab1961d0b9f");
+    NimBLEAdvertisementData scanRespData; // Proper way to enable scan response
+    pAdvertising->setScanResponseData(scanRespData);
+    pAdvertising->setName("InfTank");
+
+    pAdvertising->start();
+    
+    Serial.println("\nBLE Advertising started");
+  }
+  
+  
   //pin setup
   pinMode(INF_TRIG_PIN, OUTPUT);
   pinMode(INF_ECHO_PIN, INPUT);
@@ -24,34 +59,25 @@ void setup()
 
   if(get_level_inf() == -1){
     SENSOR_ERROR = true;
-    Serial.println("ERROR: lower tank sensor malfunctioning.");
+    Serial.println("ERROR: tank sensor malfunctioning.");
   }
   else{
-    Serial.println("lower tank sensor working properly.");
+    Serial.println("Tank sensor working properly.");
     SENSOR_ERROR = false;
+  }    
+  
+  //first data update
+  //build error flags//
+  uint16_t error_flags = 0;
+  if(SENSOR_ERROR){
+    error_flags |= 0x01;
   }
-
-  //Bluetooth setup
-  if(!BLE.begin()){
-    BLE_ERROR = true;
-    Serial.println("Failed to start BLE!");
-  }
-  else{
-    BLE.setLocalName("infTank");
-    BLE.setDeviceName("infTank");
-    BLE.setAdvertisedService(systemService);
-    systemService.addCharacteristic(waterLevel);
-    systemService.addCharacteristic(infErrors);
-    BLE.addService(systemService);
-    
-    BLE.setEventHandler(BLEDisconnected, disconnect_handler);
-    BLE.setEventHandler(BLEConnected, connect_handler);
-
-    BLE.advertise();
-    Serial.println("Started advertising...");
-    BLE_ERROR = false;
-  }
-
+  pInfLevel->setValue((uint8_t)get_level_inf()); 
+  pErrorFlags->setValue(error_flags); 
+  pInfLevel->indicate();
+  pErrorFlags->indicate();
+  Serial.println("Updated data via BLE.");
+  
 }
 
 void loop(){

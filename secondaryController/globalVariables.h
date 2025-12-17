@@ -1,6 +1,6 @@
 #include "config/config.h"
 #include <stdint.h>
-#include <ArduinoBLE.h>
+#include <NimBLEDevice.h>
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H //Prevents double definitions
@@ -18,13 +18,11 @@ extern int inf_level_at_start; //water level in sup tank when the pump started
 extern unsigned long source_time;  //in milliseconds, used to check if the system is working "as expected" for the superior tank
 extern unsigned long BLE_time; //in milliseconds, used to check elapsed time for BLE between updates
 
-extern BLEService systemService;
-extern BLEShortCharacteristic waterLevel;
-extern BLEShortCharacteristic infErrors;
+extern NimBLECharacteristic* pInfLevel;
+extern NimBLECharacteristic* pErrorFlags;
 
 extern bool SENSOR_ERROR;
 extern bool SOURCE_ERROR;
-extern bool BLE_ERROR;
 
 
 #endif
