@@ -51,7 +51,14 @@ void handle_error(){
       BLE_ERROR = true;
     }
   }
+
+  //checks error flags
+  if(BLE_ERROR || SENSOR_ERROR || PUMP_ERROR){
+    status = BLOCKING_ERROR;
+  }
 }
+
+
 
 /////////////////////////////////
 
