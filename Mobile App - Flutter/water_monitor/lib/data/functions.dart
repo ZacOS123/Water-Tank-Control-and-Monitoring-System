@@ -157,15 +157,6 @@ Widget lowerStatus(BuildContext context, Docs? measurement){
               ],
             );
   }
-  else if(measurement.documents[0].values[1] & 0x04 == 4){  //pump error
-    return Row(
-              spacing: 7,
-              children: [
-                Icon(Icons.bluetooth_disabled, color: Colors.red, size: 23),
-                Text('Can\'t Fill', style: TextStyle(fontFamily: 'Onest',fontSize: 15, fontWeight: FontWeight.w500, color: Colors.red),),
-              ],
-            );
-  }
   else if(measurement.documents[0].values[0] == 100){
     return Row(
               spacing: 7,
