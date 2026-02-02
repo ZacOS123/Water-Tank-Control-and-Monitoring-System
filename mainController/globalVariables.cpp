@@ -2,7 +2,6 @@
 #include <Arduino.h>
 
 time_t now = 0;
-unsigned long sync_time; //used to subtract boot till Now time
 unsigned long update_time = 0; //used to update cloud every TIME_TO_UPDATE
 SystemStatus status = WAITING;
 SystemStatus previous_status = PUMPING; //used for serial monitor update. Starts with pumping to update log

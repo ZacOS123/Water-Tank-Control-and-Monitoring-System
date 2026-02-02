@@ -7,6 +7,7 @@
 #include "connectivity.h"
 #include <NimBLEDevice.h>
 #include <WiFi.h>
+#include "esp_wifi.h"
 
 void setup(){
   delay(1000); //startup delay for power stability
@@ -32,33 +33,36 @@ void setup(){
     SENSOR_ERROR = false;
   }
 
-  /////////WiFi connection setup////////
-  Serial.println("Connecting to WiFi...");
-  WiFi.mode(WIFI_STA);
-  WiFi.onEvent(WiFi_error_handler);
-  WiFi.begin(ssid, password);
-
- 
   ////////Bluetooth connection setup////////
   Serial.println("Starting BLE and searching for InfTank");
 
   NimBLEDevice::init("supTank");
 
   NimBLEScan* pScan = NimBLEDevice::getScan();
-  NimBLEScanResults results = pScan->getResults(10 * 1000); // continuous scan
-  
+  pScan->setActiveScan(true);     // important if name/service is in scan response
+  pScan->clearResults();          // clear old/stale results
+  NimBLEScanResults results = pScan->getResults(5000);
+  pScan->stop();  
+  delay(50);
   if(search_and_connect(results) == 1){
     BLE_ERROR = false;
   }
   else{
     BLE_ERROR = true;
   }
+  delay(5000);  //delay for BLE connection
+
+  /////////WiFi connection setup////////
+  Serial.println("Connecting to WiFi...");
+  WiFi.mode(WIFI_STA);
+  WiFi.onEvent(WiFi_error_handler);
+  WiFi.begin(ssid, password);
+  esp_wifi_set_ps(WIFI_PS_NONE);
 }
 
 
 void loop(){
-  sup_current_level = get_level_sup(); // same here
- // get_inf_data(); //updates data from lower tank
+  sup_current_level = get_level_sup();
 
   handle_error();
   handle_upper_tank();

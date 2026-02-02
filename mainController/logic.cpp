@@ -9,7 +9,7 @@
 
 void handle_upper_tank (){
   if(status != BLOCKING_ERROR && !(inf_errors & 0x01)){ // if status normal and no lower tank sensor error
-    if(sup_current_level > SUP_ACC_LEVEL && inf_current_level >= MIN_INF_TO_PUMP){  //if upper tank under acceptable level AND lower not empty
+    if(sup_current_level < SUP_ACC_LEVEL && inf_current_level >= MIN_INF_TO_PUMP){  //if upper tank under acceptable level AND lower not empty
       start_pump();
       status = PUMPING;
       if(check_pumping() == -1){
@@ -17,7 +17,7 @@ void handle_upper_tank (){
         PUMP_ERROR = true;
       }
     }
-    if(sup_current_level > (SUP_SENSOR_HI - SUP_SENSOR_LO) / SENSOR_RANGE || inf_current_level <= 2){  //if upper tank full OR lower tank empty (2%)
+    if(sup_current_level > 100-SENSOR_RANGE || inf_current_level <= 4){  //if upper tank full OR lower tank empty (4%)
       stop_pump();
       status = WAITING;
       check_pumping(); //resets timer and level_at_start in check_pump()
@@ -42,8 +42,12 @@ void handle_error(){
   if(BLE_ERROR){
     NimBLEDevice::deleteClient(pClient);
     NimBLEScan* pScan = NimBLEDevice::getScan();
-    NimBLEScanResults results = pScan->getResults(10 * 1000);
-    
+    pScan->setActiveScan(true);     // important if name/service is in scan response
+    pScan->clearResults();          // clear old/stale results
+
+    NimBLEScanResults results = pScan->getResults(5000);
+    pScan->stop(); 
+    delay(50);
     if(search_and_connect(results) == 1){
       BLE_ERROR = false;
     }
@@ -56,9 +60,10 @@ void handle_error(){
   if(BLE_ERROR || SENSOR_ERROR || PUMP_ERROR){
     status = BLOCKING_ERROR;
   }
+  else{
+    status = WAITING;
+  }
 }
-
-
 
 /////////////////////////////////
 

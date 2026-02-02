@@ -12,7 +12,6 @@ typedef enum {
 } SystemStatus;
 
 extern time_t now;
-extern unsigned long sync_time;
 extern unsigned long update_time;
 extern SystemStatus status;
 extern SystemStatus previous_status; //used for serial monitor update

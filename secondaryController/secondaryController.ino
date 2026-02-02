@@ -24,13 +24,15 @@ void setup(){
     Serial.print("Couldn't create Service");
   }
   else{
+    ServerCallbacks* pCallbacks = new ServerCallbacks();
+    pServer->setCallbacks(pCallbacks);
     pInfLevel = pService->createCharacteristic( // Create a characteristic (read + write)
                             "74ac19c2-5aa1-4419-9426-dab1961d0b91",
-                            NIMBLE_PROPERTY::INDICATE
+                            NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::INDICATE
                         );
     pErrorFlags = pService->createCharacteristic( // Create a characteristic (read + write)
                           "74ac19c2-5aa1-4419-9426-dab1961d0b92",
-                          NIMBLE_PROPERTY::INDICATE
+                          NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::INDICATE
                         );
     if(pInfLevel == nullptr){Serial.print("could not initialize characteristic");}
 
@@ -43,7 +45,7 @@ void setup(){
     pAdvertising->setScanResponseData(scanRespData);
     pAdvertising->setName("InfTank");
 
-    pAdvertising->start();
+    pAdvertising->start(0);
     
     Serial.println("\nBLE Advertising started");
   }
@@ -86,6 +88,8 @@ void loop(){
   handle_error();
   handle_lower_tank();
   handle_communication();
+
+  
 
   log();
 }

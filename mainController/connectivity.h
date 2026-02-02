@@ -16,7 +16,6 @@ public:
 
 
 
-
 //// WiFi and Cloud ////
 void update_cloud(); //updates data on cloud (measurify)
 void WiFi_error_handler(WiFiEvent_t event, WiFiEventInfo_t info); //checks if wifi is still connected

@@ -14,14 +14,13 @@
 
 /////MAX/MIN TANK LEVELS/////
 /// ! VALUES ARE INVERTED DUE TO ULTRASONIC TOP TO BOTTOM MEASUREMENT ! ////
-#define INF_SENSOR_LO 0    //Ultrasonic low values (Tank FULL)
-#define INF_SENSOR_HI 1024  //Ultrasonic High values (Tank EMPTY)PTY)
+#define INF_SENSOR_LO 3    //Ultrasonic low values (Tank FULL)
+#define INF_SENSOR_HI 27  //Ultrasonic High values (Tank EMPTY)
 
 /////MINIMUM VALUES/////
-#define MIN_INF_TO_PUMP  (INF_SENSOR_HI - INF_SENSOR_LO)/6  //Minimum inferior tank level to pump
-#define TIME_TO_CHECK   10000            //Time in ms to check if pumping or source are working
+#define TIME_TO_CHECK   300000            //Time in ms to check if pumping or source are working
 #define SENSOR_RANGE    10    //divider of the highest value, used to give flexibility because sensor values are precise (divides tank highest level by its value)
-#define TIME_TO_UPDATE  30000  // time to update BLE data
+#define TIME_TO_UPDATE  5000  // time to update BLE data
 
 #endif
 

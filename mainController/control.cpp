@@ -36,7 +36,7 @@ int get_level_sup(){    //returns water level in superior tank. Return -1 for se
     return -1;
   }
   else{
-    return distance;
+    return (((SUP_SENSOR_HI - distance)*100)/(SUP_SENSOR_HI - SUP_SENSOR_LO));;
   }
 }
 
@@ -60,7 +60,7 @@ int check_pumping(){      //Checks if upper tank is being filled. Returns 0 for 
     pump_time = 0;          //reset timer
     return 0;
   }
-  else{  //if pumping
+  else if(status == PUMPING){  //if pumping
     if (previous_status != PUMPING){
       pump_time = millis();
       sup_level_at_start = sup_current_level;
@@ -71,7 +71,7 @@ int check_pumping(){      //Checks if upper tank is being filled. Returns 0 for 
     if (sup_current_level == -1){  //In case get_level had errors
       return 0;
     }
-    if(sup_current_level >= sup_level_at_start){  //if level not increased
+    if(sup_current_level <= sup_level_at_start){  //if level not increased
       pump_time = millis();
       sup_level_at_start = sup_current_level;
       return -1;

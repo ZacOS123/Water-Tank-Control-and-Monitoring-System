@@ -53,7 +53,17 @@ void handle_communication(){
         error_flags |= ( ((inf_current_level - INF_SENSOR_LO) / (inf_level_at_start - inf_current_level)) * TIME_TO_CHECK ) << 8;
       }
     }
-    pInfLevel->setValue((uint8_t)inf_current_level); 
+
+    //calculate percentage
+    int percentage;
+    if(inf_current_level == -1){
+      percentage = 0;
+    }
+    else{
+      percentage = (((INF_SENSOR_HI - inf_current_level)*100)/(INF_SENSOR_HI - INF_SENSOR_LO));
+    }
+    
+    pInfLevel->setValue(percentage); 
     pErrorFlags->setValue(error_flags); 
     pInfLevel->indicate();
     pErrorFlags->indicate();

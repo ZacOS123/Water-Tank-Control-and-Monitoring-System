@@ -1,6 +1,7 @@
 #include "control.h"
 #include "globalVariables.h"
 #include "config/config.h"
+#include "NimBLEDevice.h"
 
 
 
@@ -9,12 +10,11 @@
 int get_level_inf(){    //returns air level in inferior tank. Return -1 for sensor error
 
   long raw_distance [MEASURE_NUM];
-  int distance;
+  int distance = 0;
 
  //set pin to LOW
   digitalWrite(INF_TRIG_PIN, LOW); 
   delayMicroseconds(2);
-  distance = 0;
 
   //Send trigger [MEASURE_NUM] times
 
@@ -33,7 +33,7 @@ int get_level_inf(){    //returns air level in inferior tank. Return -1 for sens
   }
 
   distance = distance/MEASURE_NUM;
-
+  Serial.println(distance);
   //error check
   if(distance > INF_SENSOR_HI || distance < INF_SENSOR_LO){
     return -1;
@@ -91,6 +91,11 @@ int check_source(){      //Checks if lower tank is being filled. Returns 0 for "
 }
 
 ///////////////////////////////////////////////////
+
+void ServerCallbacks::onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason){  //used to advertise even after disconnect
+  NimBLEDevice::startAdvertising();
+}
+
 
 
 
