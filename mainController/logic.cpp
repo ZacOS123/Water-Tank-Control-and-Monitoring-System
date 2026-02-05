@@ -17,7 +17,7 @@ void handle_upper_tank (){
         PUMP_ERROR = true;
       }
     }
-    if(sup_current_level > 100-SENSOR_RANGE || inf_current_level <= 4){  //if upper tank full OR lower tank empty (4%)
+    if(sup_current_level > 100-SENSOR_TOLERANCE || inf_current_level <= 4){  //if upper tank full OR lower tank empty (4%)
       stop_pump();
       status = WAITING;
       check_pumping(); //resets timer and level_at_start in check_pump()

@@ -20,7 +20,7 @@
 #define SUP_ACC_LEVEL    80   //Superior tank threshold for pumping (lower than threshold --> pump)(percentage)
 #define TIME_TO_CHECK   300000            //Time in ms to check if pumping or source are working
 #define TIME_TO_UPDATE  10000    //time to update cloud in ms
-#define SENSOR_RANGE    3    //divider of the highest value, used to give flexibility because sensor values are precise (divides tank highest level by its value)
+#define SENSOR_TOLERANCE    5    //usage: 100%-SENSOR_TOLERANCE gives space for sensor before trigerring a sensor error
 
 
 #endif
